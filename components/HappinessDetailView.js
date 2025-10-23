@@ -214,11 +214,21 @@ export default function HappinessDetailView({ entry, mediaEntries = [], onClose 
                       }}>
                         {MEDIA_TYPES[media.type]}
                       </span>
-                      <div style={{
-                        fontSize: '0.9rem',
-                        color: '#666'
-                      }}>
-                        {formatDuration(media.duration)}
+                      <div>
+                        <div style={{
+                          fontSize: '1rem',
+                          color: '#333',
+                          fontWeight: '500',
+                          marginBottom: '0.25rem'
+                        }}>
+                          {media.title}
+                        </div>
+                        <div style={{
+                          fontSize: '0.85rem',
+                          color: '#666'
+                        }}>
+                          {formatDuration(media.duration)}
+                        </div>
                       </div>
                     </div>
                     <div style={{

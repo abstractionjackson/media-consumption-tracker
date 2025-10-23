@@ -84,6 +84,20 @@ export default function MediaTable({ data, onDeleteEntries, onEditEntry, onAddEn
         },
         sortingFn: 'basic',
       }),
+      columnHelper.accessor('title', {
+        header: 'Title',
+        cell: (info) => (
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <span style={{
+              fontSize: '0.95rem',
+              color: '#333'
+            }}>
+              {info.getValue()}
+            </span>
+          </div>
+        ),
+        sortingFn: 'basic',
+      }),
       columnHelper.accessor('duration', {
         header: 'Duration',
         cell: (info) => {
