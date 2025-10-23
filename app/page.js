@@ -15,6 +15,7 @@ export default function Home() {
   const [entries, setEntries] = useState([])
   const [isLoaded, setIsLoaded] = useState(false)
   const [showFormModal, setShowFormModal] = useState(false)
+  const [editingEntry, setEditingEntry] = useState(null)
 
   // Find today's entry
   const todayEntry = useMemo(() => {
@@ -114,6 +115,7 @@ export default function Home() {
    * Handles editing today's entry
    */
   const handleEditToday = () => {
+    setEditingEntry(todayEntry)
     setShowFormModal(true)
   }
 
@@ -130,6 +132,7 @@ export default function Home() {
    * Handles opening the form modal
    */
   const handleOpenForm = () => {
+    setEditingEntry(null)
     setShowFormModal(true)
   }
 
@@ -138,6 +141,15 @@ export default function Home() {
    */
   const handleCloseForm = () => {
     setShowFormModal(false)
+    setEditingEntry(null)
+  }
+
+  /**
+   * Handles editing an entry from the table
+   */
+  const handleEditEntry = (entry) => {
+    setEditingEntry(entry)
+    setShowFormModal(true)
   }
 
   return (
@@ -201,7 +213,7 @@ export default function Home() {
               alignItems: 'center'
             }}>
               <h2 style={{ margin: 0, color: '#333', fontSize: '1.5rem' }}>
-                {todayEntry ? 'Edit Your Happiness' : 'Log Your Happiness'} 📝
+                {editingEntry ? 'Edit Your Happiness' : 'Log Your Happiness'} 📝
               </h2>
               <button
                 onClick={handleCloseForm}
@@ -232,14 +244,16 @@ export default function Home() {
             </div>
             <div style={{ padding: '1.5rem' }}>
               <HappinessForm 
-                initialEntry={todayEntry}
+                initialEntry={editingEntry}
                 onEntryAdded={(entry) => {
                   handleEntryAdded(entry)
                   setShowFormModal(false)
+                  setEditingEntry(null)
                 }}
                 onEntryUpdated={(oldEntry, newEntry) => {
                   handleUpdateEntry(oldEntry, newEntry)
                   setShowFormModal(false)
+                  setEditingEntry(null)
                 }}
               />
             </div>
@@ -416,6 +430,7 @@ export default function Home() {
           data={entries} 
           onDeleteEntries={handleDeleteEntries}
           onUpdateEntry={handleUpdateEntry}
+          onEditEntry={handleEditEntry}
         />
       </section>
     </main>

@@ -24,9 +24,10 @@ const columnHelper = createColumnHelper()
  * @param {Array} props.data - Array of happiness entries
  * @param {Function} props.onDeleteEntries - Callback when entries are deleted
  * @param {Function} props.onUpdateEntry - Callback when an entry is updated
+ * @param {Function} props.onEditEntry - Callback when edit button is clicked for selected entry
  * @returns {JSX.Element} The data table
  */
-export default function HappinessTable({ data, onDeleteEntries, onUpdateEntry }) {
+export default function HappinessTable({ data, onDeleteEntries, onUpdateEntry, onEditEntry }) {
   const [rowSelection, setRowSelection] = useState({})
   const [sorting, setSorting] = useState([{ id: 'date', desc: true }])
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
@@ -224,6 +225,17 @@ export default function HappinessTable({ data, onDeleteEntries, onUpdateEntry })
     setShowDeleteDialog(true)
   }
 
+  /**
+   * Handles editing the selected entry
+   */
+  const handleEditSelected = () => {
+    if (selectedCount !== 1) return
+    const selectedEntry = selectedRows[0].original
+    if (onEditEntry) {
+      onEditEntry(selectedEntry)
+    }
+  }
+
   const handleConfirmDelete = () => {
     const selectedData = selectedRows.map(row => row.original)
     onDeleteEntries(selectedData)
@@ -265,33 +277,62 @@ export default function HappinessTable({ data, onDeleteEntries, onUpdateEntry })
         <div style={{ fontSize: '0.9rem', color: '#666' }}>
           {data.length} total entries • {selectedCount} selected
         </div>
-        <button
-          onClick={handleDeleteSelected}
-          disabled={selectedCount === 0}
-          style={{
-            padding: '0.5rem 1rem',
-            backgroundColor: selectedCount > 0 ? '#dc3545' : '#ccc',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            fontSize: '0.9rem',
-            fontWeight: 'bold',
-            cursor: selectedCount > 0 ? 'pointer' : 'not-allowed',
-            transition: 'background-color 0.2s'
-          }}
-          onMouseOver={(e) => {
-            if (selectedCount > 0) {
-              e.target.style.backgroundColor = '#c82333'
-            }
-          }}
-          onMouseOut={(e) => {
-            if (selectedCount > 0) {
-              e.target.style.backgroundColor = '#dc3545'
-            }
-          }}
-        >
-          Delete Selected ({selectedCount})
-        </button>
+        <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <button
+            onClick={handleEditSelected}
+            disabled={selectedCount !== 1}
+            style={{
+              padding: '0.5rem 1rem',
+              backgroundColor: selectedCount === 1 ? '#007cba' : '#ccc',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              fontSize: '0.9rem',
+              fontWeight: 'bold',
+              cursor: selectedCount === 1 ? 'pointer' : 'not-allowed',
+              transition: 'background-color 0.2s'
+            }}
+            onMouseOver={(e) => {
+              if (selectedCount === 1) {
+                e.target.style.backgroundColor = '#005a87'
+              }
+            }}
+            onMouseOut={(e) => {
+              if (selectedCount === 1) {
+                e.target.style.backgroundColor = '#007cba'
+              }
+            }}
+          >
+            Edit Selected (1)
+          </button>
+          <button
+            onClick={handleDeleteSelected}
+            disabled={selectedCount === 0}
+            style={{
+              padding: '0.5rem 1rem',
+              backgroundColor: selectedCount > 0 ? '#dc3545' : '#ccc',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              fontSize: '0.9rem',
+              fontWeight: 'bold',
+              cursor: selectedCount > 0 ? 'pointer' : 'not-allowed',
+              transition: 'background-color 0.2s'
+            }}
+            onMouseOver={(e) => {
+              if (selectedCount > 0) {
+                e.target.style.backgroundColor = '#c82333'
+              }
+            }}
+            onMouseOut={(e) => {
+              if (selectedCount > 0) {
+                e.target.style.backgroundColor = '#dc3545'
+              }
+            }}
+          >
+            Delete Selected ({selectedCount})
+          </button>
+        </div>
       </div>
 
       {/* Data table */}
