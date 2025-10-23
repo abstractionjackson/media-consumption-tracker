@@ -5,6 +5,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { Eye } from 'lucide-react'
 import {
   useReactTable,
   getCoreRowModel,
@@ -14,11 +15,13 @@ import {
 } from '@tanstack/react-table'
 import { MEDIA_TYPES, formatDate, formatDuration } from '../lib/media.js'
 import ConfirmDialog from './ConfirmDialog.js'
+import MediaDetailView from './MediaDetailView.js'
 
 const columnHelper = createColumnHelper()
 
 /**
  * Data table component for displaying and managing media entries
+ * Aggregates entries by date
  * @param {Object} props - Component props
  * @param {Array} props.data - Array of media entries
  * @param {Function} props.onDeleteEntries - Callback when entries are deleted
@@ -29,6 +32,35 @@ export default function MediaTable({ data, onDeleteEntries, onEditEntry, onAddEn
   const [rowSelection, setRowSelection] = useState({})
   const [sorting, setSorting] = useState([{ id: 'date', desc: true }])
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [detailModalOpen, setDetailModalOpen] = useState(false)
+  const [selectedDateData, setSelectedDateData] = useState(null)
+
+  // Aggregate data by date
+  const aggregatedData = useMemo(() => {
+    const grouped = {}
+    
+    data.forEach(entry => {
+      if (!grouped[entry.date]) {
+        grouped[entry.date] = {
+          date: entry.date,
+          entries: [],
+          types: new Set(),
+          totalDuration: 0
+        }
+      }
+      grouped[entry.date].entries.push(entry)
+      grouped[entry.date].types.add(entry.type)
+      grouped[entry.date].totalDuration += entry.duration
+    })
+
+    // Convert to array and sort by date
+    return Object.values(grouped).map(group => ({
+      date: group.date,
+      entries: group.entries,
+      types: Array.from(group.types),
+      totalDuration: group.totalDuration
+    }))
+  }, [data])
 
   // Table columns definition
   const columns = useMemo(
@@ -62,44 +94,35 @@ export default function MediaTable({ data, onDeleteEntries, onEditEntry, onAddEn
         ),
         sortingFn: 'datetime',
       }),
-      columnHelper.accessor('type', {
-        header: 'Media Type',
+      columnHelper.accessor('types', {
+        header: 'Media Types',
         cell: (info) => {
-          const type = info.getValue()
+          const types = info.getValue()
           return (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <span style={{
-                display: 'inline-block',
-                padding: '0.25rem 0.5rem',
-                backgroundColor: '#e3f2fd',
-                color: '#1976d2',
-                borderRadius: '4px',
-                fontSize: '0.9rem',
-                fontWeight: 'bold'
-              }}>
-                {MEDIA_TYPES[type]}
-              </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+              {types.map(type => (
+                <span 
+                  key={type}
+                  style={{
+                    display: 'inline-block',
+                    padding: '0.25rem 0.5rem',
+                    backgroundColor: '#e3f2fd',
+                    color: '#1976d2',
+                    borderRadius: '4px',
+                    fontSize: '0.9rem',
+                    fontWeight: 'bold'
+                  }}
+                >
+                  {MEDIA_TYPES[type]}
+                </span>
+              ))}
             </div>
           )
         },
         sortingFn: 'basic',
       }),
-      columnHelper.accessor('title', {
-        header: 'Title',
-        cell: (info) => (
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <span style={{
-              fontSize: '0.95rem',
-              color: '#333'
-            }}>
-              {info.getValue()}
-            </span>
-          </div>
-        ),
-        sortingFn: 'basic',
-      }),
-      columnHelper.accessor('duration', {
-        header: 'Duration',
+      columnHelper.accessor('totalDuration', {
+        header: 'Total Duration',
         cell: (info) => {
           const duration = info.getValue()
           return (
@@ -118,12 +141,44 @@ export default function MediaTable({ data, onDeleteEntries, onEditEntry, onAddEn
         },
         sortingFn: 'basic',
       }),
+      columnHelper.display({
+        id: 'actions',
+        header: 'Actions',
+        cell: ({ row }) => (
+          <button
+            onClick={() => handleViewDetails(row.original)}
+            style={{
+              padding: '0.5rem 1rem',
+              backgroundColor: '#007cba',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              fontSize: '0.9rem',
+              cursor: 'pointer',
+              transition: 'background-color 0.2s',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}
+            onMouseOver={(e) => {
+              e.target.style.backgroundColor = '#005a87'
+            }}
+            onMouseOut={(e) => {
+              e.target.style.backgroundColor = '#007cba'
+            }}
+          >
+            <Eye size={16} />
+            View Details
+          </button>
+        ),
+        size: 150,
+      }),
     ],
     []
   )
 
   const table = useReactTable({
-    data,
+    data: aggregatedData,
     columns,
     state: {
       rowSelection,
@@ -135,34 +190,41 @@ export default function MediaTable({ data, onDeleteEntries, onEditEntry, onAddEn
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getRowId: (row) => row.id,
+    getRowId: (row) => row.date,
   })
 
   const selectedRows = table.getFilteredSelectedRowModel().rows
   const selectedCount = selectedRows.length
 
   /**
+   * Handles opening detail modal for a date
+   */
+  const handleViewDetails = (rowData) => {
+    setSelectedDateData(rowData)
+    setDetailModalOpen(true)
+  }
+
+  /**
+   * Handles closing detail modal
+   */
+  const handleCloseDetail = () => {
+    setDetailModalOpen(false)
+    setSelectedDateData(null)
+  }
+
+  /**
    * Handles deletion of selected entries
+   * Deletes all individual entries for selected dates
    */
   const handleDeleteSelected = () => {
     if (selectedCount === 0) return
     setShowDeleteDialog(true)
   }
 
-  /**
-   * Handles editing the selected entry
-   */
-  const handleEditSelected = () => {
-    if (selectedCount !== 1) return
-    const selectedEntry = selectedRows[0].original
-    if (onEditEntry) {
-      onEditEntry(selectedEntry)
-    }
-  }
-
   const handleConfirmDelete = () => {
-    const selectedData = selectedRows.map(row => row.original)
-    onDeleteEntries(selectedData)
+    // Collect all individual entries from selected dates
+    const allEntriesToDelete = selectedRows.flatMap(row => row.original.entries)
+    onDeleteEntries(allEntriesToDelete)
     setRowSelection({})
     setShowDeleteDialog(false)
   }
@@ -199,7 +261,7 @@ export default function MediaTable({ data, onDeleteEntries, onEditEntry, onAddEn
         border: '1px solid #e9ecef'
       }}>
         <div style={{ fontSize: '0.9rem', color: '#666' }}>
-          {data.length} total entries • {selectedCount} selected
+          {data.length} total entries • {aggregatedData.length} dates • {selectedCount} selected
         </div>
         <div style={{ display: 'flex', gap: '0.75rem' }}>
           <button
@@ -223,33 +285,6 @@ export default function MediaTable({ data, onDeleteEntries, onEditEntry, onAddEn
             }}
           >
             + Add Media Entry
-          </button>
-          <button
-            onClick={handleEditSelected}
-            disabled={selectedCount !== 1}
-            style={{
-              padding: '0.5rem 1rem',
-              backgroundColor: selectedCount === 1 ? '#007cba' : '#ccc',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              fontSize: '0.9rem',
-              fontWeight: 'bold',
-              cursor: selectedCount === 1 ? 'pointer' : 'not-allowed',
-              transition: 'background-color 0.2s'
-            }}
-            onMouseOver={(e) => {
-              if (selectedCount === 1) {
-                e.target.style.backgroundColor = '#005a87'
-              }
-            }}
-            onMouseOut={(e) => {
-              if (selectedCount === 1) {
-                e.target.style.backgroundColor = '#007cba'
-              }
-            }}
-          >
-            Edit Selected (1)
           </button>
           <button
             onClick={handleDeleteSelected}
@@ -377,6 +412,73 @@ export default function MediaTable({ data, onDeleteEntries, onEditEntry, onAddEn
           </tbody>
         </table>
       </div>
+
+      {/* Detail Modal */}
+      {detailModalOpen && selectedDateData && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '1rem'
+          }}
+          onClick={handleCloseDetail}
+        >
+          <div
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              maxWidth: '800px',
+              width: '100%',
+              maxHeight: '90vh',
+              overflow: 'auto',
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{
+              padding: '1.5rem',
+              borderBottom: '1px solid #e0e0e0',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              position: 'sticky',
+              top: 0,
+              backgroundColor: 'white',
+              zIndex: 1
+            }}>
+              <h2 style={{ margin: 0, color: '#333', fontSize: '1.5rem' }}>
+                Media Details
+              </h2>
+              <button
+                onClick={handleCloseDetail}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '1.5rem',
+                  cursor: 'pointer',
+                  color: '#666',
+                  padding: '0.25rem',
+                  lineHeight: 1
+                }}
+              >
+                ×
+              </button>
+            </div>
+            <MediaDetailView 
+              date={selectedDateData.date}
+              mediaEntries={selectedDateData.entries}
+            />
+          </div>
+        </div>
+      )}
     </div>
   )
 }
