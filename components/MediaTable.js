@@ -301,9 +301,12 @@ export default function MediaTable({ data, onDeleteEntries, onEditEntry, onAddEn
                         : typeof header.column.columnDef.header === 'function'
                         ? header.column.columnDef.header(header.getContext())
                         : header.column.columnDef.header}
-                      {header.column.getIsSorted() && (
-                        <span>
-                          {header.column.getIsSorted() === 'desc' ? ' 🔽' : ' 🔼'}
+                      {header.column.getCanSort() && (
+                        <span style={{ fontSize: '0.8rem', color: '#6c757d' }}>
+                          {{
+                            asc: '↑',
+                            desc: '↓',
+                          }[header.column.getIsSorted()] ?? '↕'}
                         </span>
                       )}
                     </div>
