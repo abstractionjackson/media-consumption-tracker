@@ -12,11 +12,12 @@ import { HAPPINESS_LEVELS, getTodayDate } from '../lib/happiness.js'
  * Form component for logging happiness entries
  * @param {Object} props - Component props
  * @param {Function} props.onEntryAdded - Callback when entry is successfully added
+ * @param {Object} props.initialEntry - Optional initial entry for editing
  * @returns {JSX.Element} The happiness entry form
  */
-export default function HappinessForm({ onEntryAdded }) {
-  const [date, setDate] = useState(getTodayDate())
-  const [happiness, setHappiness] = useState(0)
+export default function HappinessForm({ onEntryAdded, initialEntry }) {
+  const [date, setDate] = useState(initialEntry?.date || getTodayDate())
+  const [happiness, setHappiness] = useState(initialEntry?.happiness ?? 0)
   const [errors, setErrors] = useState([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')

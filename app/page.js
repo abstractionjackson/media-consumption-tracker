@@ -227,10 +227,13 @@ export default function Home() {
               </button>
             </div>
             <div style={{ padding: '1.5rem' }}>
-              <HappinessForm onEntryAdded={(entry) => {
-                handleEntryAdded(entry)
-                setShowFormModal(false)
-              }} />
+              <HappinessForm 
+                initialEntry={todayEntry}
+                onEntryAdded={(entry) => {
+                  handleEntryAdded(entry)
+                  setShowFormModal(false)
+                }} 
+              />
             </div>
           </div>
         </div>
