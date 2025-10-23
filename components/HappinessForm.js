@@ -58,21 +58,7 @@ export default function HappinessForm({ onEntryAdded }) {
   }
 
   return (
-    <div style={{
-      padding: '1.5rem',
-      border: '1px solid #ddd',
-      borderRadius: '8px',
-      backgroundColor: '#f9f9f9',
-      marginBottom: '2rem'
-    }}>
-      <h2 style={{ 
-        color: '#333', 
-        marginBottom: '1rem',
-        fontSize: '1.5rem'
-      }}>
-        Log Your Happiness 📝
-      </h2>
-
+    <div>
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: '1rem' }}>
           <label 

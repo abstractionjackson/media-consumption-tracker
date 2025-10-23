@@ -14,7 +14,7 @@ const STORAGE_KEY = 'happiness-vibe-entries'
 export default function Home() {
   const [entries, setEntries] = useState([])
   const [isLoaded, setIsLoaded] = useState(false)
-  const [showForm, setShowForm] = useState(false)
+  const [showFormModal, setShowFormModal] = useState(false)
 
   // Find today's entry
   const todayEntry = useMemo(() => {
@@ -46,6 +46,25 @@ export default function Home() {
       }
     }
   }, [entries, isLoaded])
+
+  // Handle modal keyboard events and body scroll lock
+  useEffect(() => {
+    if (showFormModal) {
+      document.body.style.overflow = 'hidden'
+      
+      const handleEscape = (e) => {
+        if (e.key === 'Escape') {
+          handleCloseForm()
+        }
+      }
+      
+      document.addEventListener('keydown', handleEscape)
+      return () => {
+        document.body.style.overflow = 'unset'
+        document.removeEventListener('keydown', handleEscape)
+      }
+    }
+  }, [showFormModal])
 
   /**
    * Handles adding a new happiness entry
@@ -91,7 +110,7 @@ export default function Home() {
    * Handles editing today's entry
    */
   const handleEditToday = () => {
-    setShowForm(true)
+    setShowFormModal(true)
   }
 
   /**
@@ -101,6 +120,20 @@ export default function Home() {
     if (todayEntry) {
       handleDeleteEntries([todayEntry])
     }
+  }
+
+  /**
+   * Handles opening the form modal
+   */
+  const handleOpenForm = () => {
+    setShowFormModal(true)
+  }
+
+  /**
+   * Handles closing the form modal
+   */
+  const handleCloseForm = () => {
+    setShowFormModal(false)
   }
 
   return (
@@ -126,12 +159,124 @@ export default function Home() {
         </p>
       </header>
 
-      {/* Happiness Entry Form or Today's Entry Card */}
-      {!todayEntry || showForm ? (
-        <HappinessForm onEntryAdded={(entry) => {
-          handleEntryAdded(entry)
-          setShowForm(false)
-        }} />
+      {/* Form Modal */}
+      {showFormModal && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '1rem'
+          }}
+          onClick={handleCloseForm}
+        >
+          <div
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              maxWidth: '600px',
+              width: '100%',
+              maxHeight: '90vh',
+              overflow: 'auto',
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{
+              padding: '1.5rem',
+              borderBottom: '1px solid #e0e0e0',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <h2 style={{ margin: 0, color: '#333', fontSize: '1.5rem' }}>
+                {todayEntry ? 'Edit Your Happiness' : 'Log Your Happiness'} 📝
+              </h2>
+              <button
+                onClick={handleCloseForm}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '1.5rem',
+                  cursor: 'pointer',
+                  color: '#666',
+                  padding: '0',
+                  width: '32px',
+                  height: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '4px',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseOver={(e) => {
+                  e.target.style.backgroundColor = '#f0f0f0'
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.backgroundColor = 'transparent'
+                }}
+              >
+                ×
+              </button>
+            </div>
+            <div style={{ padding: '1.5rem' }}>
+              <HappinessForm onEntryAdded={(entry) => {
+                handleEntryAdded(entry)
+                setShowFormModal(false)
+              }} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Log Happiness Button or Today's Entry Card */}
+      {!todayEntry ? (
+        <div style={{
+          padding: '2rem',
+          border: '1px solid #ddd',
+          borderRadius: '8px',
+          backgroundColor: '#f9f9f9',
+          marginBottom: '2rem',
+          textAlign: 'center'
+        }}>
+          <p style={{
+            fontSize: '1.1rem',
+            color: '#666',
+            marginBottom: '1.5rem'
+          }}>
+            You haven't logged your happiness for today yet.
+          </p>
+          <button
+            onClick={handleOpenForm}
+            style={{
+              padding: '1rem 2rem',
+              backgroundColor: '#007cba',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              fontSize: '1.1rem',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              transition: 'background-color 0.2s',
+              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+            }}
+            onMouseOver={(e) => {
+              e.target.style.backgroundColor = '#005a87'
+            }}
+            onMouseOut={(e) => {
+              e.target.style.backgroundColor = '#007cba'
+            }}
+          >
+            Log Your Happiness 📝
+          </button>
+        </div>
       ) : (
         <div style={{
           padding: '1.5rem',
