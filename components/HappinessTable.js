@@ -14,6 +14,7 @@ import {
   createColumnHelper
 } from '@tanstack/react-table'
 import { HAPPINESS_LEVELS, formatDate } from '../lib/happiness.js'
+import { formatDuration } from '../lib/media.js'
 import ConfirmDialog from './ConfirmDialog.js'
 
 const columnHelper = createColumnHelper()
@@ -22,17 +23,29 @@ const columnHelper = createColumnHelper()
  * Data table component for displaying and managing happiness entries
  * @param {Object} props - Component props
  * @param {Array} props.data - Array of happiness entries
+ * @param {Array} props.mediaData - Array of media entries
  * @param {Function} props.onDeleteEntries - Callback when entries are deleted
  * @param {Function} props.onUpdateEntry - Callback when an entry is updated
  * @param {Function} props.onEditEntry - Callback when edit button is clicked for selected entry
  * @returns {JSX.Element} The data table
  */
-export default function HappinessTable({ data, onDeleteEntries, onUpdateEntry, onEditEntry }) {
+export default function HappinessTable({ data, mediaData = [], onDeleteEntries, onUpdateEntry, onEditEntry }) {
   const [rowSelection, setRowSelection] = useState({})
   const [sorting, setSorting] = useState([{ id: 'date', desc: true }])
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [editingCell, setEditingCell] = useState(null)
   const [editValue, setEditValue] = useState('')
+
+  /**
+   * Calculates total media duration for a given date
+   * @param {string} date - Date in YYYY-MM-DD format
+   * @returns {number} Total duration in minutes
+   */
+  const getMediaDurationForDate = (date) => {
+    return mediaData
+      .filter(media => media.date === date)
+      .reduce((total, media) => total + media.duration, 0)
+  }
 
   /**
    * Handles starting edit mode for a cell
@@ -194,8 +207,48 @@ export default function HappinessTable({ data, onDeleteEntries, onUpdateEntry, o
         },
         sortingFn: 'basic',
       }),
+      columnHelper.accessor('date', {
+        id: 'mediaDuration',
+        header: 'Media Duration',
+        cell: (info) => {
+          const date = info.getValue()
+          const totalDuration = getMediaDurationForDate(date)
+          
+          if (totalDuration === 0) {
+            return (
+              <span style={{ color: '#999', fontStyle: 'italic' }}>
+                No media
+              </span>
+            )
+          }
+          
+          return (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span style={{
+                display: 'inline-block',
+                padding: '0.25rem 0.5rem',
+                backgroundColor: '#e3f2fd',
+                color: '#1976d2',
+                borderRadius: '4px',
+                fontSize: '0.9rem',
+                fontWeight: 'bold'
+              }}>
+                {formatDuration(totalDuration)}
+              </span>
+              <span style={{ fontSize: '0.85rem', color: '#666' }}>
+                ({totalDuration} min)
+              </span>
+            </div>
+          )
+        },
+        sortingFn: (rowA, rowB) => {
+          const durationA = getMediaDurationForDate(rowA.original.date)
+          const durationB = getMediaDurationForDate(rowB.original.date)
+          return durationA - durationB
+        },
+      }),
     ],
-    [editingCell, editValue, handleStartEdit, handleSaveEdit, handleCancelEdit]
+    [editingCell, editValue, handleStartEdit, handleSaveEdit, handleCancelEdit, mediaData, getMediaDurationForDate]
   )
 
   const table = useReactTable({

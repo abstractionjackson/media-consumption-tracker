@@ -447,7 +447,8 @@ export default function Home() {
           Your Happiness Entries
         </h2>
         <HappinessTable 
-          data={entries} 
+          data={entries}
+          mediaData={mediaEntries}
           onDeleteEntries={handleDeleteEntries}
           onUpdateEntry={handleUpdateEntry}
           onEditEntry={handleEditEntry}
