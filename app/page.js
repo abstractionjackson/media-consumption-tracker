@@ -6,6 +6,7 @@ import HappinessForm from '../components/HappinessForm.js'
 import HappinessTable from '../components/HappinessTable.js'
 import MediaForm from '../components/MediaForm.js'
 import MediaTable from '../components/MediaTable.js'
+import HappinessDetailView from '../components/HappinessDetailView.js'
 
 const STORAGE_KEY = 'happiness-vibe-entries'
 const MEDIA_STORAGE_KEY = 'happiness-vibe-media-entries'
@@ -23,6 +24,8 @@ export default function Home() {
   const [showMediaFormModal, setShowMediaFormModal] = useState(false)
   const [editingMediaEntry, setEditingMediaEntry] = useState(null)
   const [activeTab, setActiveTab] = useState('happiness')
+  const [showDetailView, setShowDetailView] = useState(false)
+  const [detailEntry, setDetailEntry] = useState(null)
 
   // Find today's entry
   const todayEntry = useMemo(() => {
@@ -243,6 +246,22 @@ export default function Home() {
   const handleEditMediaEntry = (entry) => {
     setEditingMediaEntry(entry)
     setShowMediaFormModal(true)
+  }
+
+  /**
+   * Handles viewing details of a happiness entry
+   */
+  const handleViewDetails = (entry) => {
+    setDetailEntry(entry)
+    setShowDetailView(true)
+  }
+
+  /**
+   * Handles closing the detail view
+   */
+  const handleCloseDetailView = () => {
+    setShowDetailView(false)
+    setDetailEntry(null)
   }
 
   return (
@@ -599,6 +618,7 @@ export default function Home() {
                 onDeleteEntries={handleDeleteEntries}
                 onUpdateEntry={handleUpdateEntry}
                 onEditEntry={handleEditEntry}
+                onViewDetails={handleViewDetails}
               />
             )}
 
@@ -698,6 +718,15 @@ export default function Home() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Detail View Modal */}
+      {showDetailView && detailEntry && (
+        <HappinessDetailView
+          entry={detailEntry}
+          mediaEntries={mediaEntries.filter(media => media.date === detailEntry.date)}
+          onClose={handleCloseDetailView}
+        />
       )}
     </main>
   )

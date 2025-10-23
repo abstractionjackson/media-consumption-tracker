@@ -27,9 +27,10 @@ const columnHelper = createColumnHelper()
  * @param {Function} props.onDeleteEntries - Callback when entries are deleted
  * @param {Function} props.onUpdateEntry - Callback when an entry is updated
  * @param {Function} props.onEditEntry - Callback when edit button is clicked for selected entry
+ * @param {Function} props.onViewDetails - Callback when view details button is clicked
  * @returns {JSX.Element} The data table
  */
-export default function HappinessTable({ data, mediaData = [], onDeleteEntries, onUpdateEntry, onEditEntry }) {
+export default function HappinessTable({ data, mediaData = [], onDeleteEntries, onUpdateEntry, onEditEntry, onViewDetails }) {
   const [rowSelection, setRowSelection] = useState({})
   const [sorting, setSorting] = useState([{ id: 'date', desc: true }])
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
@@ -242,8 +243,38 @@ export default function HappinessTable({ data, mediaData = [], onDeleteEntries, 
           return durationA - durationB
         },
       }),
+      columnHelper.display({
+        id: 'actions',
+        header: 'Actions',
+        cell: (info) => (
+          <button
+            onClick={() => onViewDetails?.(info.row.original)}
+            style={{
+              padding: '0.5rem 1rem',
+              backgroundColor: '#007cba',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              fontSize: '0.85rem',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              transition: 'background-color 0.2s',
+              whiteSpace: 'nowrap'
+            }}
+            onMouseOver={(e) => {
+              e.target.style.backgroundColor = '#005a87'
+            }}
+            onMouseOut={(e) => {
+              e.target.style.backgroundColor = '#007cba'
+            }}
+          >
+            View Details
+          </button>
+        ),
+        size: 120,
+      }),
     ],
-    [editingCell, editValue, handleStartEdit, handleSaveEdit, handleCancelEdit, mediaData, getMediaDurationForDate]
+    [editingCell, editValue, handleStartEdit, handleSaveEdit, handleCancelEdit, mediaData, getMediaDurationForDate, onViewDetails]
   )
 
   const table = useReactTable({
