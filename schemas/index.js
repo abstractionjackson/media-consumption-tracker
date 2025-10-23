@@ -2,14 +2,16 @@
  * @fileoverview Core data schema definitions and validation utilities
  */
 
-import happinessSchema from './happiness.json'
+import happinessSchema from './happiness.json' with { type: 'json' }
+import mediaSchema from './media.json' with { type: 'json' }
 
 /**
  * All available schemas
  * @type {Object<string, Object>}
  */
 export const schemas = {
-  happiness: happinessSchema
+  happiness: happinessSchema,
+  media: mediaSchema
 }
 
 /**
@@ -45,6 +47,13 @@ export function validateData(data, schema) {
       errors.push(`Field ${key} must be a string`)
     } else if (prop.type === 'integer' && (!Number.isInteger(value))) {
       errors.push(`Field ${key} must be an integer`)
+    }
+    
+    // Enum validation for strings
+    if (prop.type === 'string' && prop.enum) {
+      if (!prop.enum.includes(value)) {
+        errors.push(`Field ${key} must be one of: ${prop.enum.join(', ')}`)
+      }
     }
     
     // Pattern validation for strings
@@ -90,6 +99,33 @@ export function validateHappiness(data) {
 export function createHappinessEntry(date, happiness) {
   const entry = { date, happiness }
   const validation = validateHappiness(entry)
+  
+  if (validation.isValid) {
+    return { success: true, data: entry }
+  } else {
+    return { success: false, errors: validation.errors }
+  }
+}
+
+/**
+ * Validates a media entry
+ * @param {Object} data - The media data to validate
+ * @returns {Object} Validation result
+ */
+export function validateMedia(data) {
+  return validateData(data, schemas.media)
+}
+
+/**
+ * Creates a new media entry with validation
+ * @param {string} date - Date in YYYY-MM-DD format
+ * @param {string} type - Media type (book, video, podcast, music)
+ * @param {number} duration - Duration in minutes (positive integer)
+ * @returns {Object} Either the valid media object or validation errors
+ */
+export function createMediaEntry(date, type, duration) {
+  const entry = { date, type, duration }
+  const validation = validateMedia(entry)
   
   if (validation.isValid) {
     return { success: true, data: entry }
