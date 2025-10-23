@@ -9,10 +9,15 @@
     "start": "next start",
     "lint": "next lint"
   },
-  "keywords": ["nextjs", "react", "happiness"],
+  "keywords": [
+    "nextjs",
+    "react",
+    "happiness"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@tanstack/react-table": "^8.21.3",
     "next": "^16.0.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"

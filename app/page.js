@@ -1,15 +1,16 @@
 'use client'
 
 import { useState } from 'react'
-import { SAMPLE_DATA, HAPPINESS_LEVELS, formatDate } from '../lib/happiness.js'
+import { HAPPINESS_LEVELS, formatDate } from '../lib/happiness.js'
 import HappinessForm from '../components/HappinessForm.js'
+import HappinessTable from '../components/HappinessTable.js'
 
 /**
  * Home page component showing happiness tracking
  * @returns {JSX.Element} The home page
  */
 export default function Home() {
-  const [entries, setEntries] = useState(SAMPLE_DATA)
+  const [entries, setEntries] = useState([])
 
   /**
    * Handles adding a new happiness entry
@@ -24,10 +25,21 @@ export default function Home() {
     })
   }
 
+  /**
+   * Handles deleting selected entries
+   * @param {Array} entriesToDelete - Array of entries to delete
+   */
+  const handleDeleteEntries = (entriesToDelete) => {
+    setEntries(prevEntries => {
+      const deleteSet = new Set(entriesToDelete.map(entry => `${entry.date}-${entry.happiness}`))
+      return prevEntries.filter(entry => !deleteSet.has(`${entry.date}-${entry.happiness}`))
+    })
+  }
+
   return (
     <main style={{ 
       padding: '2rem', 
-      maxWidth: '800px', 
+      maxWidth: '1000px', 
       margin: '0 auto',
       fontFamily: 'system-ui, -apple-system, sans-serif' 
     }}>
@@ -52,69 +64,12 @@ export default function Home() {
 
       <section>
         <h2 style={{ color: '#333', marginBottom: '1rem' }}>
-          Your Happiness Entries ({entries.length})
+          Your Happiness Entries
         </h2>
-        {entries.length === 0 ? (
-          <p style={{ 
-            color: '#666', 
-            fontStyle: 'italic',
-            textAlign: 'center',
-            padding: '2rem'
-          }}>
-            No entries yet. Add your first happiness entry above! 🎯
-          </p>
-        ) : (
-          <div style={{ 
-            display: 'grid', 
-            gap: '1rem' 
-          }}>
-            {entries.map((entry, index) => (
-              <div key={`${entry.date}-${index}`} style={{
-                padding: '1rem',
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                backgroundColor: '#fff',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-              }}>
-                <div style={{ 
-                  display: 'flex', 
-                  justifyContent: 'space-between', 
-                  alignItems: 'center',
-                  marginBottom: '0.5rem'
-                }}>
-                  <div style={{ fontWeight: 'bold', color: '#333' }}>
-                    {formatDate(entry.date)}
-                  </div>
-                  <div style={{ 
-                    fontSize: '0.9rem', 
-                    color: '#666',
-                    backgroundColor: '#f5f5f5',
-                    padding: '0.25rem 0.5rem',
-                    borderRadius: '4px'
-                  }}>
-                    Level {entry.happiness}
-                  </div>
-                </div>
-                <div style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>
-                  {HAPPINESS_LEVELS[entry.happiness.toString()]}
-                </div>
-                <details style={{ fontSize: '0.9rem', color: '#666' }}>
-                  <summary style={{ cursor: 'pointer', marginBottom: '0.5rem' }}>
-                    Show raw data
-                  </summary>
-                  <pre style={{
-                    backgroundColor: '#f9f9f9',
-                    padding: '0.5rem',
-                    borderRadius: '4px',
-                    overflow: 'auto'
-                  }}>
-                    {JSON.stringify(entry, null, 2)}
-                  </pre>
-                </details>
-              </div>
-            ))}
-          </div>
-        )}
+        <HappinessTable 
+          data={entries} 
+          onDeleteEntries={handleDeleteEntries}
+        />
       </section>
     </main>
   )
