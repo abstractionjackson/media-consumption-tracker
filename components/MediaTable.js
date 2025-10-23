@@ -55,7 +55,11 @@ export default function MediaTable({ data, onDeleteEntries, onEditEntry, onAddEn
       }),
       columnHelper.accessor('date', {
         header: 'Date',
-        cell: (info) => formatDate(info.getValue()),
+        cell: (info) => (
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            {formatDate(info.getValue())}
+          </div>
+        ),
         sortingFn: 'datetime',
       }),
       columnHelper.accessor('type', {
