@@ -16,15 +16,23 @@ import { MEDIA_TYPES } from '../lib/media.js'
  * @param {Object} props.initialEntry - Optional initial entry for editing
  * @param {Function} props.onEntryUpdated - Optional callback when entry is updated (passes old and new entry)
  * @param {Function} props.onMediaEntriesAdded - Optional callback when media entries are added
+ * @param {Array} props.allMediaEntries - All media entries to filter by date
  * @returns {JSX.Element} The happiness entry form
  */
-export default function HappinessForm({ onEntryAdded, initialEntry, onEntryUpdated, onMediaEntriesAdded }) {
+export default function HappinessForm({ onEntryAdded, initialEntry, onEntryUpdated, onMediaEntriesAdded, allMediaEntries = [] }) {
   const [date, setDate] = useState(initialEntry?.date || getTodayDate())
   const [happiness, setHappiness] = useState(initialEntry?.happiness ?? 0)
-  const [mediaEntries, setMediaEntries] = useState([{ type: 'book', duration: 30 }])
   const [errors, setErrors] = useState([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
+  
+  // Get media entries for the current date
+  const getMediaEntriesForDate = (selectedDate) => {
+    const entriesForDate = allMediaEntries.filter(media => media.date === selectedDate)
+    return entriesForDate.length > 0 ? entriesForDate : []
+  }
+  
+  const [mediaEntries, setMediaEntries] = useState(getMediaEntriesForDate(initialEntry?.date || getTodayDate()))
 
   /**
    * Adds a new media entry fieldset
@@ -54,6 +62,17 @@ export default function HappinessForm({ onEntryAdded, initialEntry, onEntryUpdat
   }
 
   /**
+   * Handles date change and updates media entries accordingly
+   * @param {string} newDate - New date value
+   */
+  const handleDateChange = (newDate) => {
+    setDate(newDate)
+    // Update media entries to match the new date
+    const entriesForDate = getMediaEntriesForDate(newDate)
+    setMediaEntries(entriesForDate)
+  }
+
+  /**
    * Handles form submission
    * @param {Event} e - Form submit event
    */
@@ -66,11 +85,13 @@ export default function HappinessForm({ onEntryAdded, initialEntry, onEntryUpdat
     // Create and validate the happiness entry
     const happinessResult = createHappinessEntry(date, parseInt(happiness))
     
-    // Validate media entries
-    const mediaResults = mediaEntries.map((media, index) => ({
-      index,
-      result: createMediaEntry(date, media.type, media.duration)
-    }))
+    // Only validate media entries if there are any
+    const mediaResults = mediaEntries.length > 0 
+      ? mediaEntries.map((media, index) => ({
+          index,
+          result: createMediaEntry(date, media.type, media.duration)
+        }))
+      : []
     
     const allErrors = []
     if (!happinessResult.success) {
@@ -105,7 +126,7 @@ export default function HappinessForm({ onEntryAdded, initialEntry, onEntryUpdat
       if (!initialEntry) {
         setDate(getTodayDate())
         setHappiness(0)
-        setMediaEntries([{ type: 'book', duration: 30 }])
+        setMediaEntries([])
       }
     } else {
       setErrors(allErrors)
@@ -141,7 +162,7 @@ export default function HappinessForm({ onEntryAdded, initialEntry, onEntryUpdat
             type="date"
             id="date"
             value={date}
-            onChange={(e) => setDate(e.target.value)}
+            onChange={(e) => handleDateChange(e.target.value)}
             style={{
               padding: '0.5rem',
               border: '1px solid #ccc',
@@ -236,7 +257,20 @@ export default function HappinessForm({ onEntryAdded, initialEntry, onEntryUpdat
             </button>
           </div>
 
-          {mediaEntries.map((media, index) => (
+          {mediaEntries.length === 0 ? (
+            <div style={{
+              padding: '2rem',
+              textAlign: 'center',
+              color: '#999',
+              fontStyle: 'italic',
+              backgroundColor: '#fafafa',
+              border: '1px dashed #ddd',
+              borderRadius: '6px'
+            }}>
+              No media entries for this date. Click "+ Add Media" to add one.
+            </div>
+          ) : (
+            mediaEntries.map((media, index) => (
             <fieldset
               key={index}
               style={{
@@ -324,35 +358,34 @@ export default function HappinessForm({ onEntryAdded, initialEntry, onEntryUpdat
                   />
                 </div>
 
-                {mediaEntries.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveMediaEntry(index)}
-                    style={{
-                      padding: '0.5rem 0.75rem',
-                      backgroundColor: '#dc3545',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '4px',
-                      fontSize: '0.85rem',
-                      fontWeight: 'bold',
-                      cursor: 'pointer',
-                      transition: 'background-color 0.2s'
-                    }}
-                    onMouseOver={(e) => {
-                      e.target.style.backgroundColor = '#c82333'
-                    }}
-                    onMouseOut={(e) => {
-                      e.target.style.backgroundColor = '#dc3545'
-                    }}
-                    title="Remove this media entry"
-                  >
-                    Remove
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={() => handleRemoveMediaEntry(index)}
+                  style={{
+                    padding: '0.5rem 0.75rem',
+                    backgroundColor: '#dc3545',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    fontSize: '0.85rem',
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                    transition: 'background-color 0.2s'
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.backgroundColor = '#c82333'
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.backgroundColor = '#dc3545'
+                  }}
+                  title="Remove this media entry"
+                >
+                  Remove
+                </button>
               </div>
             </fieldset>
-          ))}
+          ))
+          )}
         </div>
 
         {/* Error messages */}

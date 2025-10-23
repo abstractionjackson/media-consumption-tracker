@@ -264,6 +264,7 @@ export default function Home() {
             <div style={{ padding: '1.5rem' }}>
               <HappinessForm 
                 initialEntry={editingEntry}
+                allMediaEntries={mediaEntries}
                 onEntryAdded={(entry) => {
                   handleEntryAdded(entry)
                   setShowFormModal(false)
