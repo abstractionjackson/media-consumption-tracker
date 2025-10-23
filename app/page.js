@@ -377,7 +377,7 @@ export default function Home() {
       )}
 
       {/* Log Happiness Button or Today's Entry Card */}
-      {!todayEntry ? (
+      {!todayEntry && (
         <div style={{
           padding: '2rem',
           border: '1px solid #ddd',
@@ -416,124 +416,6 @@ export default function Home() {
           >
             Log Your Happiness 📝
           </button>
-        </div>
-      ) : (
-        <div style={{
-          padding: '1.5rem',
-          border: '1px solid #ddd',
-          borderRadius: '8px',
-          backgroundColor: '#f9f9f9',
-          marginBottom: '2rem'
-        }}>
-          <h2 style={{ 
-            color: '#333', 
-            marginBottom: '1rem',
-            fontSize: '1.5rem'
-          }}>
-            Today's Happiness Entry ✨
-          </h2>
-          
-          <div style={{
-            padding: '1.5rem',
-            backgroundColor: '#fff',
-            border: '1px solid #e0e0e0',
-            borderRadius: '8px',
-            marginBottom: '1rem'
-          }}>
-            <div style={{ marginBottom: '1rem' }}>
-              <div style={{ 
-                fontSize: '0.9rem', 
-                color: '#666',
-                marginBottom: '0.5rem',
-                fontWeight: 'bold'
-              }}>
-                Date
-              </div>
-              <div style={{ fontSize: '1rem', color: '#333' }}>
-                {formatDate(todayEntry.date)}
-              </div>
-            </div>
-
-            <div>
-              <div style={{ 
-                fontSize: '0.9rem', 
-                color: '#666',
-                marginBottom: '0.5rem',
-                fontWeight: 'bold'
-              }}>
-                Happiness Level
-              </div>
-              <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '0.5rem' 
-              }}>
-                <span style={{
-                  display: 'inline-block',
-                  minWidth: '30px',
-                  textAlign: 'center',
-                  padding: '0.25rem 0.5rem',
-                  backgroundColor: todayEntry.happiness >= 0 ? '#e8f5e8' : '#ffeaea',
-                  color: todayEntry.happiness >= 0 ? '#2d5a2d' : '#8b2635',
-                  borderRadius: '4px',
-                  fontSize: '1.1rem',
-                  fontWeight: 'bold'
-                }}>
-                  {todayEntry.happiness}
-                </span>
-                <span style={{ fontSize: '1.1rem', color: '#333' }}>
-                  {HAPPINESS_LEVELS[todayEntry.happiness.toString()]}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', gap: '0.75rem' }}>
-            <button
-              onClick={handleEditToday}
-              style={{
-                padding: '0.75rem 1.5rem',
-                backgroundColor: '#007cba',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                fontSize: '0.9rem',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-                transition: 'background-color 0.2s'
-              }}
-              onMouseOver={(e) => {
-                e.target.style.backgroundColor = '#005a87'
-              }}
-              onMouseOut={(e) => {
-                e.target.style.backgroundColor = '#007cba'
-              }}
-            >
-              Edit Entry
-            </button>
-            <button
-              onClick={handleDeleteToday}
-              style={{
-                padding: '0.75rem 1.5rem',
-                backgroundColor: '#dc3545',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                fontSize: '0.9rem',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-                transition: 'background-color 0.2s'
-              }}
-              onMouseOver={(e) => {
-                e.target.style.backgroundColor = '#c82333'
-              }}
-              onMouseOut={(e) => {
-                e.target.style.backgroundColor = '#dc3545'
-              }}
-            >
-              Delete Entry
-            </button>
-          </div>
         </div>
       )}
 
