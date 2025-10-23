@@ -4,6 +4,8 @@ import { useState, useEffect, useMemo } from 'react'
 import { HAPPINESS_LEVELS, formatDate, getTodayDate } from '../lib/happiness.js'
 import HappinessForm from '../components/HappinessForm.js'
 import HappinessTable from '../components/HappinessTable.js'
+import MediaForm from '../components/MediaForm.js'
+import MediaTable from '../components/MediaTable.js'
 
 const STORAGE_KEY = 'happiness-vibe-entries'
 const MEDIA_STORAGE_KEY = 'happiness-vibe-media-entries'
@@ -18,6 +20,8 @@ export default function Home() {
   const [isLoaded, setIsLoaded] = useState(false)
   const [showFormModal, setShowFormModal] = useState(false)
   const [editingEntry, setEditingEntry] = useState(null)
+  const [showMediaFormModal, setShowMediaFormModal] = useState(false)
+  const [editingMediaEntry, setEditingMediaEntry] = useState(null)
 
   // Find today's entry
   const todayEntry = useMemo(() => {
@@ -58,12 +62,16 @@ export default function Home() {
 
   // Handle modal keyboard events and body scroll lock
   useEffect(() => {
-    if (showFormModal) {
+    if (showFormModal || showMediaFormModal) {
       document.body.style.overflow = 'hidden'
       
       const handleEscape = (e) => {
         if (e.key === 'Escape') {
-          handleCloseForm()
+          if (showFormModal) {
+            handleCloseForm()
+          } else if (showMediaFormModal) {
+            handleCloseMediaForm()
+          }
         }
       }
       
@@ -73,7 +81,7 @@ export default function Home() {
         document.removeEventListener('keydown', handleEscape)
       }
     }
-  }, [showFormModal])
+  }, [showFormModal, showMediaFormModal])
 
   /**
    * Handles adding media entries
@@ -179,6 +187,61 @@ export default function Home() {
   const handleEditEntry = (entry) => {
     setEditingEntry(entry)
     setShowFormModal(true)
+  }
+
+  /**
+   * Handles adding a media entry
+   */
+  const handleMediaEntryAdded = (newEntry) => {
+    setMediaEntries(prevMedia => {
+      // Add new entry and sort by date (newest first)
+      return [newEntry, ...prevMedia].sort((a, b) => new Date(b.date) - new Date(a.date))
+    })
+  }
+
+  /**
+   * Handles updating a media entry
+   */
+  const handleMediaEntryUpdated = (oldEntry, newEntry) => {
+    setMediaEntries(prevMedia => {
+      return prevMedia.map(media => 
+        media.id === oldEntry.id ? newEntry : media
+      )
+    })
+  }
+
+  /**
+   * Handles deleting media entries
+   */
+  const handleDeleteMediaEntries = (entriesToDelete) => {
+    setMediaEntries(prevMedia => {
+      const deleteSet = new Set(entriesToDelete.map(entry => entry.id))
+      return prevMedia.filter(entry => !deleteSet.has(entry.id))
+    })
+  }
+
+  /**
+   * Handles opening the media form modal
+   */
+  const handleOpenMediaForm = () => {
+    setEditingMediaEntry(null)
+    setShowMediaFormModal(true)
+  }
+
+  /**
+   * Handles closing the media form modal
+   */
+  const handleCloseMediaForm = () => {
+    setShowMediaFormModal(false)
+    setEditingMediaEntry(null)
+  }
+
+  /**
+   * Handles editing a media entry from the table
+   */
+  const handleEditMediaEntry = (entry) => {
+    setEditingMediaEntry(entry)
+    setShowMediaFormModal(true)
   }
 
   return (
@@ -464,6 +527,104 @@ export default function Home() {
           onDeleteEntries={handleDeleteEntries}
           onUpdateEntry={handleUpdateEntry}
           onEditEntry={handleEditEntry}
+        />
+      </section>
+
+      {/* Media Form Modal */}
+      {showMediaFormModal && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '1rem'
+          }}
+          onClick={handleCloseMediaForm}
+        >
+          <div
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              maxWidth: '600px',
+              width: '100%',
+              maxHeight: '90vh',
+              overflow: 'auto',
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{
+              padding: '1.5rem',
+              borderBottom: '1px solid #e0e0e0',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <h2 style={{ margin: 0, color: '#333', fontSize: '1.5rem' }}>
+                {editingMediaEntry ? 'Edit Media Entry' : 'Log Media Entry'} 🎬
+              </h2>
+              <button
+                onClick={handleCloseMediaForm}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '1.5rem',
+                  cursor: 'pointer',
+                  color: '#666',
+                  padding: '0',
+                  width: '32px',
+                  height: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '4px',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseOver={(e) => {
+                  e.target.style.backgroundColor = '#f0f0f0'
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.backgroundColor = 'transparent'
+                }}
+              >
+                ×
+              </button>
+            </div>
+            <div style={{ padding: '1.5rem' }}>
+              <MediaForm 
+                initialEntry={editingMediaEntry}
+                onEntryAdded={(entry) => {
+                  handleMediaEntryAdded(entry)
+                  setShowMediaFormModal(false)
+                  setEditingMediaEntry(null)
+                }}
+                onEntryUpdated={(oldEntry, newEntry) => {
+                  handleMediaEntryUpdated(oldEntry, newEntry)
+                  setShowMediaFormModal(false)
+                  setEditingMediaEntry(null)
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      <section style={{ marginTop: '3rem' }}>
+        <h2 style={{ color: '#333', marginBottom: '1rem' }}>
+          Your Media Entries
+        </h2>
+        <MediaTable 
+          data={mediaEntries}
+          onDeleteEntries={handleDeleteMediaEntries}
+          onEditEntry={handleEditMediaEntry}
+          onAddEntry={handleOpenMediaForm}
         />
       </section>
     </main>
