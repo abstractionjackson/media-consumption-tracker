@@ -5,7 +5,7 @@
 'use client'
 
 import { useState } from 'react'
-import { createHappinessEntry, createMediaEntry } from '../schemas/index.js'
+import { createHappinessEntry } from '../schemas/index.js'
 import { HAPPINESS_LEVELS, getTodayDate } from '../lib/happiness.js'
 
 /**
@@ -75,26 +75,7 @@ export default function HappinessForm({ onEntryAdded, initialEntry, onEntryUpdat
     // Create and validate the happiness entry
     const happinessResult = createHappinessEntry(date, parseInt(happiness))
     
-    // Only validate media entries if there are any
-    const mediaResults = mediaEntries.length > 0 
-      ? mediaEntries.map((media, index) => ({
-          index,
-          result: createMediaEntry(date, media.type, media.duration, media.id)
-        }))
-      : []
-    
-    const allErrors = []
-    if (!happinessResult.success) {
-      allErrors.push(...happinessResult.errors.map(e => `Happiness: ${e}`))
-    }
-    
-    mediaResults.forEach(({ index, result }) => {
-      if (!result.success) {
-        allErrors.push(...result.errors.map(e => `Media ${index + 1}: ${e}`))
-      }
-    })
-    
-    if (allErrors.length === 0) {
+    if (happinessResult.success) {
       setSuccessMessage('Entry logged successfully! 🎉')
       
       // If editing an existing entry, use onEntryUpdated callback
@@ -104,22 +85,13 @@ export default function HappinessForm({ onEntryAdded, initialEntry, onEntryUpdat
         onEntryAdded(happinessResult.data)
       }
       
-      // Add media entries
-      if (onMediaEntriesAdded) {
-        const validMediaEntries = mediaResults
-          .filter(({ result }) => result.success)
-          .map(({ result }) => result.data)
-        onMediaEntriesAdded(validMediaEntries)
-      }
-      
       // Reset form only if not editing
       if (!initialEntry) {
         setDate(getTodayDate())
         setHappiness(0)
-        setMediaEntries([])
       }
     } else {
-      setErrors(allErrors)
+      setErrors(happinessResult.errors)
     }
     
     setIsSubmitting(false)
