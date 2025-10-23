@@ -39,6 +39,7 @@ export default function HappinessForm({ onEntryAdded, initialEntry, onEntryUpdat
    * Adds a new media entry fieldset
    */
   const handleAddMediaEntry = () => {
+    // New entries don't have id yet - will be generated on submit
     setMediaEntries([...mediaEntries, { type: 'book', duration: 30 }])
   }
 
@@ -53,8 +54,8 @@ export default function HappinessForm({ onEntryAdded, initialEntry, onEntryUpdat
     const updatedEntries = mediaEntries.filter((_, i) => i !== index)
     setMediaEntries(updatedEntries)
     
-    // If this is an existing media entry (has all fields matching stored entry), notify parent to delete
-    if (onMediaEntryDeleted && mediaToRemove.date && mediaToRemove.type && mediaToRemove.duration) {
+    // If this is an existing media entry (has id), notify parent to delete
+    if (onMediaEntryDeleted && mediaToRemove.id) {
       onMediaEntryDeleted(mediaToRemove)
     }
   }
@@ -99,7 +100,7 @@ export default function HappinessForm({ onEntryAdded, initialEntry, onEntryUpdat
     const mediaResults = mediaEntries.length > 0 
       ? mediaEntries.map((media, index) => ({
           index,
-          result: createMediaEntry(date, media.type, media.duration)
+          result: createMediaEntry(date, media.type, media.duration, media.id)
         }))
       : []
     

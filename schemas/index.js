@@ -108,6 +108,18 @@ export function createHappinessEntry(date, happiness) {
 }
 
 /**
+ * Generates a UUID v4
+ * @returns {string} UUID string
+ */
+function generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0
+    const v = c === 'x' ? r : (r & 0x3 | 0x8)
+    return v.toString(16)
+  })
+}
+
+/**
  * Validates a media entry
  * @param {Object} data - The media data to validate
  * @returns {Object} Validation result
@@ -121,10 +133,16 @@ export function validateMedia(data) {
  * @param {string} date - Date in YYYY-MM-DD format
  * @param {string} type - Media type (book, video, podcast, music)
  * @param {number} duration - Duration in minutes (positive integer)
+ * @param {string} id - Optional UUID (will be generated if not provided)
  * @returns {Object} Either the valid media object or validation errors
  */
-export function createMediaEntry(date, type, duration) {
-  const entry = { date, type, duration }
+export function createMediaEntry(date, type, duration, id = null) {
+  const entry = { 
+    id: id || generateUUID(),
+    date, 
+    type, 
+    duration 
+  }
   const validation = validateMedia(entry)
   
   if (validation.isValid) {

@@ -92,11 +92,7 @@ export default function Home() {
    */
   const handleMediaEntryDeleted = (mediaEntry) => {
     setMediaEntries(prevMedia => {
-      return prevMedia.filter(media => 
-        !(media.date === mediaEntry.date && 
-          media.type === mediaEntry.type && 
-          media.duration === mediaEntry.duration)
-      )
+      return prevMedia.filter(media => media.id !== mediaEntry.id)
     })
   }
 

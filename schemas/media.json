@@ -5,6 +5,12 @@
   "description": "A media consumption tracking entry with date, type, and duration",
   "type": "object",
   "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+      "description": "Unique identifier (UUID v4)",
+      "examples": ["550e8400-e29b-41d4-a716-446655440000"]
+    },
     "date": {
       "type": "string",
       "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
@@ -25,6 +31,6 @@
       "examples": [30, 60, 120, 240]
     }
   },
-  "required": ["date", "type", "duration"],
+  "required": ["id", "date", "type", "duration"],
   "additionalProperties": false
 }

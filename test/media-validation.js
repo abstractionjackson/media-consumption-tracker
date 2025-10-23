@@ -22,6 +22,8 @@ validTests.forEach((test, idx) => {
   console.log(`  ${idx + 1}. ${JSON.stringify(test)} -> ${result.success ? '✓ PASS' : '✗ FAIL'}`)
   if (!result.success) {
     console.log(`     Errors: ${result.errors.join(', ')}`)
+  } else {
+    console.log(`     Generated ID: ${result.data.id}`)
   }
 })
 
