@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://happiness-vibe.app/schemas/happiness.json",
+  "title": "Happiness Entry",
+  "description": "A daily happiness tracking entry with date and happiness level",
+  "type": "object",
+  "properties": {
+    "date": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "format": "date",
+      "description": "Date in YYYY-MM-DD format",
+      "examples": ["2024-10-23", "2023-12-25"]
+    },
+    "happiness": {
+      "type": "integer",
+      "minimum": -2,
+      "maximum": 2,
+      "description": "Happiness level on a scale from -2 (very unhappy) to 2 (very happy)",
+      "examples": [-2, -1, 0, 1, 2]
+    }
+  },
+  "required": ["date", "happiness"],
+  "additionalProperties": false
+}
