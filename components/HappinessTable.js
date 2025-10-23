@@ -469,8 +469,7 @@ export default function HappinessTable({ data, mediaData = [], onDeleteEntries, 
                       key={cell.id}
                       style={{
                         padding: '1rem',
-                        borderBottom: '1px solid #e9ecef',
-                        verticalAlign: 'top'
+                        borderBottom: '1px solid #e9ecef'
                       }}
                     >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
