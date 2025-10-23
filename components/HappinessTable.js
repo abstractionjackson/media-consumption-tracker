@@ -14,7 +14,7 @@ import {
   flexRender,
   createColumnHelper
 } from '@tanstack/react-table'
-import { HAPPINESS_LEVELS, formatDate } from '../lib/happiness.js'
+import { formatDate } from '../lib/happiness.js'
 import { formatDuration } from '../lib/media.js'
 import ConfirmDialog from './ConfirmDialog.js'
 
@@ -161,9 +161,6 @@ export default function HappinessTable({ data, mediaData = [], onDeleteEntries, 
                   margin: 0
                 }}
               />
-              <span style={{ fontSize: '0.9rem', color: '#495057' }}>
-                {HAPPINESS_LEVELS[editValue] || ''}
-              </span>
             </div>
           ) : (
             <div 
@@ -198,7 +195,6 @@ export default function HappinessTable({ data, mediaData = [], onDeleteEntries, 
               }}>
                 {level}
               </span>
-              <span>{HAPPINESS_LEVELS[level.toString()]}</span>
             </div>
           )
         },

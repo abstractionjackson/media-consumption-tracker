@@ -4,7 +4,7 @@
 
 'use client'
 
-import { HAPPINESS_LEVELS, formatDate } from '../lib/happiness.js'
+import { formatDate } from '../lib/happiness.js'
 import { MEDIA_TYPES, formatDuration } from '../lib/media.js'
 
 /**
@@ -150,13 +150,6 @@ export default function HappinessDetailView({ entry, mediaEntries = [], onClose 
                 borderRadius: '8px'
               }}>
                 {entry.happiness}
-              </div>
-              <div style={{
-                fontSize: '1.25rem',
-                color: entry.happiness >= 0 ? '#2d5a2d' : '#8b2635',
-                fontWeight: '500'
-              }}>
-                {HAPPINESS_LEVELS[entry.happiness.toString()]}
               </div>
             </div>
           </div>

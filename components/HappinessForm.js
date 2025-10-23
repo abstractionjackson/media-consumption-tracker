@@ -7,7 +7,7 @@
 import { useState } from 'react'
 import { Check, Frown, Meh, Smile } from 'lucide-react'
 import { createHappinessEntry } from '../schemas/index.js'
-import { HAPPINESS_LEVELS, getTodayDate } from '../lib/happiness.js'
+import { getTodayDate } from '../lib/happiness.js'
 
 /**
  * Form component for logging happiness entries
@@ -153,7 +153,7 @@ export default function HappinessForm({ onEntryAdded, initialEntry, onEntryUpdat
               color: '#333'
             }}
           >
-            Happiness Level: {HAPPINESS_LEVELS[happiness.toString()]}
+            Happiness Level: {happiness}
           </label>
           <input
             type="range"
