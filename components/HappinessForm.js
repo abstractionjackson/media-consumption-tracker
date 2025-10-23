@@ -110,6 +110,7 @@ export default function HappinessForm({ onEntryAdded, initialEntry }) {
             step="1"
             value={happiness}
             onChange={handleHappinessChange}
+            autoFocus
             style={{
               width: '100%',
               maxWidth: '300px',
