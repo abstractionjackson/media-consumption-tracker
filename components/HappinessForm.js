@@ -7,7 +7,6 @@
 import { useState } from 'react'
 import { createHappinessEntry, createMediaEntry } from '../schemas/index.js'
 import { HAPPINESS_LEVELS, getTodayDate } from '../lib/happiness.js'
-import { MEDIA_TYPES } from '../lib/media.js'
 
 /**
  * Form component for logging happiness entries
@@ -36,14 +35,6 @@ export default function HappinessForm({ onEntryAdded, initialEntry, onEntryUpdat
   const [mediaEntries, setMediaEntries] = useState(getMediaEntriesForDate(initialEntry?.date || getTodayDate()))
 
   /**
-   * Adds a new media entry fieldset
-   */
-  const handleAddMediaEntry = () => {
-    // New entries don't have id yet - will be generated on submit
-    setMediaEntries([...mediaEntries, { type: 'book', duration: 30 }])
-  }
-
-  /**
    * Removes a media entry fieldset
    * @param {number} index - Index of the media entry to remove
    */
@@ -58,18 +49,6 @@ export default function HappinessForm({ onEntryAdded, initialEntry, onEntryUpdat
     if (onMediaEntryDeleted && mediaToRemove.id) {
       onMediaEntryDeleted(mediaToRemove)
     }
-  }
-
-  /**
-   * Updates a media entry field
-   * @param {number} index - Index of the media entry
-   * @param {string} field - Field name (type or duration)
-   * @param {*} value - New value
-   */
-  const handleMediaEntryChange = (index, field, value) => {
-    const updated = [...mediaEntries]
-    updated[index][field] = field === 'duration' ? parseInt(value) || 0 : value
-    setMediaEntries(updated)
   }
 
   /**
@@ -226,177 +205,6 @@ export default function HappinessForm({ onEntryAdded, initialEntry, onEntryUpdat
             <span>😐 Neutral</span>
             <span>😄 Very Happy</span>
           </div>
-        </div>
-
-        {/* Media Entries Section */}
-        <div style={{ marginBottom: '1.5rem' }}>
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            alignItems: 'center',
-            marginBottom: '1rem'
-          }}>
-            <label style={{ 
-              fontWeight: 'bold', 
-              color: '#333',
-              fontSize: '1rem'
-            }}>
-              Media Consumed:
-            </label>
-            <button
-              type="button"
-              onClick={handleAddMediaEntry}
-              style={{
-                padding: '0.5rem 1rem',
-                backgroundColor: '#28a745',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                fontSize: '0.85rem',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-                transition: 'background-color 0.2s'
-              }}
-              onMouseOver={(e) => {
-                e.target.style.backgroundColor = '#218838'
-              }}
-              onMouseOut={(e) => {
-                e.target.style.backgroundColor = '#28a745'
-              }}
-            >
-              + Add Media
-            </button>
-          </div>
-
-          {mediaEntries.length === 0 ? (
-            <div style={{
-              padding: '2rem',
-              textAlign: 'center',
-              color: '#999',
-              fontStyle: 'italic',
-              backgroundColor: '#fafafa',
-              border: '1px dashed #ddd',
-              borderRadius: '6px'
-            }}>
-              No media entries for this date. Click "+ Add Media" to add one.
-            </div>
-          ) : (
-            mediaEntries.map((media, index) => (
-            <fieldset
-              key={index}
-              style={{
-                border: '1px solid #ddd',
-                borderRadius: '6px',
-                padding: '1rem',
-                marginBottom: '1rem',
-                backgroundColor: '#fafafa'
-              }}
-            >
-              <legend style={{ 
-                fontWeight: 'bold', 
-                color: '#555',
-                fontSize: '0.9rem',
-                padding: '0 0.5rem'
-              }}>
-                Media {index + 1}
-              </legend>
-
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: '1fr 1fr auto',
-                gap: '1rem',
-                alignItems: 'end'
-              }}>
-                <div>
-                  <label 
-                    htmlFor={`media-type-${index}`}
-                    style={{ 
-                      display: 'block', 
-                      fontWeight: 'bold', 
-                      marginBottom: '0.5rem',
-                      color: '#333',
-                      fontSize: '0.9rem'
-                    }}
-                  >
-                    Type:
-                  </label>
-                  <select
-                    id={`media-type-${index}`}
-                    value={media.type}
-                    onChange={(e) => handleMediaEntryChange(index, 'type', e.target.value)}
-                    style={{
-                      padding: '0.5rem',
-                      border: '1px solid #ccc',
-                      borderRadius: '4px',
-                      fontSize: '1rem',
-                      width: '100%'
-                    }}
-                  >
-                    {Object.entries(MEDIA_TYPES).map(([value, label]) => (
-                      <option key={value} value={value}>
-                        {label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label 
-                    htmlFor={`media-duration-${index}`}
-                    style={{ 
-                      display: 'block', 
-                      fontWeight: 'bold', 
-                      marginBottom: '0.5rem',
-                      color: '#333',
-                      fontSize: '0.9rem'
-                    }}
-                  >
-                    Duration (minutes):
-                  </label>
-                  <input
-                    type="number"
-                    id={`media-duration-${index}`}
-                    min="1"
-                    value={media.duration}
-                    onChange={(e) => handleMediaEntryChange(index, 'duration', e.target.value)}
-                    style={{
-                      padding: '0.5rem',
-                      border: '1px solid #ccc',
-                      borderRadius: '4px',
-                      fontSize: '1rem',
-                      width: '100%'
-                    }}
-                  />
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => handleRemoveMediaEntry(index)}
-                  style={{
-                    padding: '0.5rem 0.75rem',
-                    backgroundColor: '#dc3545',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    fontSize: '0.85rem',
-                    fontWeight: 'bold',
-                    cursor: 'pointer',
-                    transition: 'background-color 0.2s'
-                  }}
-                  onMouseOver={(e) => {
-                    e.target.style.backgroundColor = '#c82333'
-                  }}
-                  onMouseOut={(e) => {
-                    e.target.style.backgroundColor = '#dc3545'
-                  }}
-                  title="Remove this media entry"
-                >
-                  Remove
-                </button>
-              </div>
-            </fieldset>
-          ))
-          )}
         </div>
 
         {/* Error messages */}
