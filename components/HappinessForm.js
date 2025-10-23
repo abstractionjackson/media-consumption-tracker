@@ -204,27 +204,6 @@ export default function HappinessForm({ onEntryAdded }) {
           {isSubmitting ? 'Logging...' : 'Log Happiness Entry'}
         </button>
       </form>
-
-      {/* Current selection preview */}
-      <div style={{
-        marginTop: '1.5rem',
-        padding: '1rem',
-        backgroundColor: '#fff',
-        border: '1px solid #ddd',
-        borderRadius: '4px'
-      }}>
-        <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1rem', color: '#333' }}>
-          Preview:
-        </h3>
-        <pre style={{
-          fontSize: '0.9rem',
-          color: '#666',
-          margin: 0,
-          whiteSpace: 'pre-wrap'
-        }}>
-          {JSON.stringify({ date, happiness: parseInt(happiness) }, null, 2)}
-        </pre>
-      </div>
     </div>
   )
 }
