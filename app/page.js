@@ -1,10 +1,29 @@
+'use client'
+
+import { useState } from 'react'
 import { SAMPLE_DATA, HAPPINESS_LEVELS, formatDate } from '../lib/happiness.js'
+import HappinessForm from '../components/HappinessForm.js'
 
 /**
  * Home page component showing happiness tracking
  * @returns {JSX.Element} The home page
  */
 export default function Home() {
+  const [entries, setEntries] = useState(SAMPLE_DATA)
+
+  /**
+   * Handles adding a new happiness entry
+   * @param {Object} newEntry - The new happiness entry
+   */
+  const handleEntryAdded = (newEntry) => {
+    setEntries(prevEntries => {
+      // Remove any existing entry for the same date
+      const filtered = prevEntries.filter(entry => entry.date !== newEntry.date)
+      // Add the new entry and sort by date (newest first)
+      return [newEntry, ...filtered].sort((a, b) => new Date(b.date) - new Date(a.date))
+    })
+  }
+
   return (
     <main style={{ 
       padding: '2rem', 
@@ -28,9 +47,12 @@ export default function Home() {
         </p>
       </header>
 
-      <section>
+      {/* Happiness Entry Form */}
+      <HappinessForm onEntryAdded={handleEntryAdded} />
+
+      <section style={{ marginBottom: '2rem' }}>
         <h2 style={{ color: '#333', marginBottom: '1rem' }}>
-          Happiness Scale
+          Happiness Scale Reference
         </h2>
         <div style={{ 
           display: 'grid', 
@@ -44,7 +66,8 @@ export default function Home() {
               borderRadius: '4px',
               display: 'flex',
               justifyContent: 'space-between',
-              alignItems: 'center'
+              alignItems: 'center',
+              backgroundColor: '#fff'
             }}>
               <span style={{ fontWeight: 'bold' }}>Level {level}:</span>
               <span>{description}</span>
@@ -55,31 +78,69 @@ export default function Home() {
 
       <section>
         <h2 style={{ color: '#333', marginBottom: '1rem' }}>
-          Sample Entries
+          Your Happiness Entries ({entries.length})
         </h2>
-        <div style={{ 
-          display: 'grid', 
-          gap: '1rem' 
-        }}>
-          {SAMPLE_DATA.map((entry, index) => (
-            <div key={index} style={{
-              padding: '1rem',
-              border: '1px solid #ddd',
-              borderRadius: '8px',
-              backgroundColor: '#f9f9f9'
-            }}>
-              <div style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>
-                {formatDate(entry.date)}
+        {entries.length === 0 ? (
+          <p style={{ 
+            color: '#666', 
+            fontStyle: 'italic',
+            textAlign: 'center',
+            padding: '2rem'
+          }}>
+            No entries yet. Add your first happiness entry above! 🎯
+          </p>
+        ) : (
+          <div style={{ 
+            display: 'grid', 
+            gap: '1rem' 
+          }}>
+            {entries.map((entry, index) => (
+              <div key={`${entry.date}-${index}`} style={{
+                padding: '1rem',
+                border: '1px solid #ddd',
+                borderRadius: '8px',
+                backgroundColor: '#fff',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+              }}>
+                <div style={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center',
+                  marginBottom: '0.5rem'
+                }}>
+                  <div style={{ fontWeight: 'bold', color: '#333' }}>
+                    {formatDate(entry.date)}
+                  </div>
+                  <div style={{ 
+                    fontSize: '0.9rem', 
+                    color: '#666',
+                    backgroundColor: '#f5f5f5',
+                    padding: '0.25rem 0.5rem',
+                    borderRadius: '4px'
+                  }}>
+                    Level {entry.happiness}
+                  </div>
+                </div>
+                <div style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>
+                  {HAPPINESS_LEVELS[entry.happiness.toString()]}
+                </div>
+                <details style={{ fontSize: '0.9rem', color: '#666' }}>
+                  <summary style={{ cursor: 'pointer', marginBottom: '0.5rem' }}>
+                    Show raw data
+                  </summary>
+                  <pre style={{
+                    backgroundColor: '#f9f9f9',
+                    padding: '0.5rem',
+                    borderRadius: '4px',
+                    overflow: 'auto'
+                  }}>
+                    {JSON.stringify(entry, null, 2)}
+                  </pre>
+                </details>
               </div>
-              <div style={{ fontSize: '1.2rem' }}>
-                {HAPPINESS_LEVELS[entry.happiness]}
-              </div>
-              <div style={{ fontSize: '0.9rem', color: '#666', marginTop: '0.5rem' }}>
-                Raw data: {JSON.stringify(entry)}
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </section>
     </main>
   )
