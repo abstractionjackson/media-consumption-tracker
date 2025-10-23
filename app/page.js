@@ -6,6 +6,7 @@ import HappinessForm from '../components/HappinessForm.js'
 import HappinessTable from '../components/HappinessTable.js'
 
 const STORAGE_KEY = 'happiness-vibe-entries'
+const MEDIA_STORAGE_KEY = 'happiness-vibe-media-entries'
 
 /**
  * Home page component showing happiness tracking
@@ -13,6 +14,7 @@ const STORAGE_KEY = 'happiness-vibe-entries'
  */
 export default function Home() {
   const [entries, setEntries] = useState([])
+  const [mediaEntries, setMediaEntries] = useState([])
   const [isLoaded, setIsLoaded] = useState(false)
   const [showFormModal, setShowFormModal] = useState(false)
   const [editingEntry, setEditingEntry] = useState(null)
@@ -30,6 +32,11 @@ export default function Home() {
       if (storedEntries) {
         setEntries(JSON.parse(storedEntries))
       }
+      
+      const storedMediaEntries = localStorage.getItem(MEDIA_STORAGE_KEY)
+      if (storedMediaEntries) {
+        setMediaEntries(JSON.parse(storedMediaEntries))
+      }
     } catch (error) {
       console.error('Failed to load entries from localStorage:', error)
     } finally {
@@ -42,11 +49,12 @@ export default function Home() {
     if (isLoaded) {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(entries))
+        localStorage.setItem(MEDIA_STORAGE_KEY, JSON.stringify(mediaEntries))
       } catch (error) {
         console.error('Failed to save entries to localStorage:', error)
       }
     }
-  }, [entries, isLoaded])
+  }, [entries, mediaEntries, isLoaded])
 
   // Handle modal keyboard events and body scroll lock
   useEffect(() => {
@@ -66,6 +74,17 @@ export default function Home() {
       }
     }
   }, [showFormModal])
+
+  /**
+   * Handles adding media entries
+   * @param {Array} newMediaEntries - Array of new media entries
+   */
+  const handleMediaEntriesAdded = (newMediaEntries) => {
+    setMediaEntries(prevMedia => {
+      // Add new entries and sort by date (newest first)
+      return [...newMediaEntries, ...prevMedia].sort((a, b) => new Date(b.date) - new Date(a.date))
+    })
+  }
 
   /**
    * Handles adding a new happiness entry
@@ -255,6 +274,7 @@ export default function Home() {
                   setShowFormModal(false)
                   setEditingEntry(null)
                 }}
+                onMediaEntriesAdded={handleMediaEntriesAdded}
               />
             </div>
           </div>

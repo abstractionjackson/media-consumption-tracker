@@ -5,8 +5,9 @@
 'use client'
 
 import { useState } from 'react'
-import { createHappinessEntry } from '../schemas/index.js'
+import { createHappinessEntry, createMediaEntry } from '../schemas/index.js'
 import { HAPPINESS_LEVELS, getTodayDate } from '../lib/happiness.js'
+import { MEDIA_TYPES } from '../lib/media.js'
 
 /**
  * Form component for logging happiness entries
@@ -14,14 +15,43 @@ import { HAPPINESS_LEVELS, getTodayDate } from '../lib/happiness.js'
  * @param {Function} props.onEntryAdded - Callback when entry is successfully added
  * @param {Object} props.initialEntry - Optional initial entry for editing
  * @param {Function} props.onEntryUpdated - Optional callback when entry is updated (passes old and new entry)
+ * @param {Function} props.onMediaEntriesAdded - Optional callback when media entries are added
  * @returns {JSX.Element} The happiness entry form
  */
-export default function HappinessForm({ onEntryAdded, initialEntry, onEntryUpdated }) {
+export default function HappinessForm({ onEntryAdded, initialEntry, onEntryUpdated, onMediaEntriesAdded }) {
   const [date, setDate] = useState(initialEntry?.date || getTodayDate())
   const [happiness, setHappiness] = useState(initialEntry?.happiness ?? 0)
+  const [mediaEntries, setMediaEntries] = useState([{ type: 'book', duration: 30 }])
   const [errors, setErrors] = useState([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
+
+  /**
+   * Adds a new media entry fieldset
+   */
+  const handleAddMediaEntry = () => {
+    setMediaEntries([...mediaEntries, { type: 'book', duration: 30 }])
+  }
+
+  /**
+   * Removes a media entry fieldset
+   * @param {number} index - Index of the media entry to remove
+   */
+  const handleRemoveMediaEntry = (index) => {
+    setMediaEntries(mediaEntries.filter((_, i) => i !== index))
+  }
+
+  /**
+   * Updates a media entry field
+   * @param {number} index - Index of the media entry
+   * @param {string} field - Field name (type or duration)
+   * @param {*} value - New value
+   */
+  const handleMediaEntryChange = (index, field, value) => {
+    const updated = [...mediaEntries]
+    updated[index][field] = field === 'duration' ? parseInt(value) || 0 : value
+    setMediaEntries(updated)
+  }
 
   /**
    * Handles form submission
@@ -33,26 +63,52 @@ export default function HappinessForm({ onEntryAdded, initialEntry, onEntryUpdat
     setErrors([])
     setSuccessMessage('')
 
-    // Create and validate the entry
-    const result = createHappinessEntry(date, parseInt(happiness))
+    // Create and validate the happiness entry
+    const happinessResult = createHappinessEntry(date, parseInt(happiness))
     
-    if (result.success) {
-      setSuccessMessage('Happiness entry logged successfully! 🎉')
+    // Validate media entries
+    const mediaResults = mediaEntries.map((media, index) => ({
+      index,
+      result: createMediaEntry(date, media.type, media.duration)
+    }))
+    
+    const allErrors = []
+    if (!happinessResult.success) {
+      allErrors.push(...happinessResult.errors.map(e => `Happiness: ${e}`))
+    }
+    
+    mediaResults.forEach(({ index, result }) => {
+      if (!result.success) {
+        allErrors.push(...result.errors.map(e => `Media ${index + 1}: ${e}`))
+      }
+    })
+    
+    if (allErrors.length === 0) {
+      setSuccessMessage('Entry logged successfully! 🎉')
       
       // If editing an existing entry, use onEntryUpdated callback
       if (initialEntry && onEntryUpdated) {
-        onEntryUpdated(initialEntry, result.data)
+        onEntryUpdated(initialEntry, happinessResult.data)
       } else if (onEntryAdded) {
-        onEntryAdded(result.data)
+        onEntryAdded(happinessResult.data)
+      }
+      
+      // Add media entries
+      if (onMediaEntriesAdded) {
+        const validMediaEntries = mediaResults
+          .filter(({ result }) => result.success)
+          .map(({ result }) => result.data)
+        onMediaEntriesAdded(validMediaEntries)
       }
       
       // Reset form only if not editing
       if (!initialEntry) {
         setDate(getTodayDate())
         setHappiness(0)
+        setMediaEntries([{ type: 'book', duration: 30 }])
       }
     } else {
-      setErrors(result.errors)
+      setErrors(allErrors)
     }
     
     setIsSubmitting(false)
@@ -138,6 +194,165 @@ export default function HappinessForm({ onEntryAdded, initialEntry, onEntryUpdat
             <span>😐 Neutral</span>
             <span>😄 Very Happy</span>
           </div>
+        </div>
+
+        {/* Media Entries Section */}
+        <div style={{ marginBottom: '1.5rem' }}>
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            marginBottom: '1rem'
+          }}>
+            <label style={{ 
+              fontWeight: 'bold', 
+              color: '#333',
+              fontSize: '1rem'
+            }}>
+              Media Consumed:
+            </label>
+            <button
+              type="button"
+              onClick={handleAddMediaEntry}
+              style={{
+                padding: '0.5rem 1rem',
+                backgroundColor: '#28a745',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                fontSize: '0.85rem',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                transition: 'background-color 0.2s'
+              }}
+              onMouseOver={(e) => {
+                e.target.style.backgroundColor = '#218838'
+              }}
+              onMouseOut={(e) => {
+                e.target.style.backgroundColor = '#28a745'
+              }}
+            >
+              + Add Media
+            </button>
+          </div>
+
+          {mediaEntries.map((media, index) => (
+            <fieldset
+              key={index}
+              style={{
+                border: '1px solid #ddd',
+                borderRadius: '6px',
+                padding: '1rem',
+                marginBottom: '1rem',
+                backgroundColor: '#fafafa'
+              }}
+            >
+              <legend style={{ 
+                fontWeight: 'bold', 
+                color: '#555',
+                fontSize: '0.9rem',
+                padding: '0 0.5rem'
+              }}>
+                Media {index + 1}
+              </legend>
+
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: '1fr 1fr auto',
+                gap: '1rem',
+                alignItems: 'end'
+              }}>
+                <div>
+                  <label 
+                    htmlFor={`media-type-${index}`}
+                    style={{ 
+                      display: 'block', 
+                      fontWeight: 'bold', 
+                      marginBottom: '0.5rem',
+                      color: '#333',
+                      fontSize: '0.9rem'
+                    }}
+                  >
+                    Type:
+                  </label>
+                  <select
+                    id={`media-type-${index}`}
+                    value={media.type}
+                    onChange={(e) => handleMediaEntryChange(index, 'type', e.target.value)}
+                    style={{
+                      padding: '0.5rem',
+                      border: '1px solid #ccc',
+                      borderRadius: '4px',
+                      fontSize: '1rem',
+                      width: '100%'
+                    }}
+                  >
+                    {Object.entries(MEDIA_TYPES).map(([value, label]) => (
+                      <option key={value} value={value}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label 
+                    htmlFor={`media-duration-${index}`}
+                    style={{ 
+                      display: 'block', 
+                      fontWeight: 'bold', 
+                      marginBottom: '0.5rem',
+                      color: '#333',
+                      fontSize: '0.9rem'
+                    }}
+                  >
+                    Duration (minutes):
+                  </label>
+                  <input
+                    type="number"
+                    id={`media-duration-${index}`}
+                    min="1"
+                    value={media.duration}
+                    onChange={(e) => handleMediaEntryChange(index, 'duration', e.target.value)}
+                    style={{
+                      padding: '0.5rem',
+                      border: '1px solid #ccc',
+                      borderRadius: '4px',
+                      fontSize: '1rem',
+                      width: '100%'
+                    }}
+                  />
+                </div>
+
+                {mediaEntries.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveMediaEntry(index)}
+                    style={{
+                      padding: '0.5rem 0.75rem',
+                      backgroundColor: '#dc3545',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      fontSize: '0.85rem',
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                      transition: 'background-color 0.2s'
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.backgroundColor = '#c82333'
+                    }}
+                    onMouseOut={(e) => {
+                      e.target.style.backgroundColor = '#dc3545'
+                    }}
+                    title="Remove this media entry"
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
+            </fieldset>
+          ))}
         </div>
 
         {/* Error messages */}
