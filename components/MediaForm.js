@@ -19,6 +19,7 @@ import { MEDIA_TYPES, getTodayDate } from '../lib/media.js'
 export default function MediaForm({ onEntryAdded, initialEntry, onEntryUpdated }) {
   const [date, setDate] = useState(initialEntry?.date || getTodayDate())
   const [type, setType] = useState(initialEntry?.type || 'book')
+  const [title, setTitle] = useState(initialEntry?.title || '')
   const [duration, setDuration] = useState(initialEntry?.duration || 30)
   const [errors, setErrors] = useState([])
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -35,7 +36,7 @@ export default function MediaForm({ onEntryAdded, initialEntry, onEntryUpdated }
     setSuccessMessage('')
 
     // Create and validate the entry
-    const result = createMediaEntry(date, type, parseInt(duration), initialEntry?.id)
+    const result = createMediaEntry(date, type, title, parseInt(duration), initialEntry?.id)
     
     if (result.success) {
       setSuccessMessage('Media entry logged successfully! 🎉')
@@ -51,6 +52,7 @@ export default function MediaForm({ onEntryAdded, initialEntry, onEntryUpdated }
       if (!initialEntry) {
         setDate(getTodayDate())
         setType('book')
+        setTitle('')
         setDuration(30)
       }
     } else {
@@ -125,6 +127,37 @@ export default function MediaForm({ onEntryAdded, initialEntry, onEntryUpdated }
               </option>
             ))}
           </select>
+        </div>
+
+        <div style={{ marginBottom: '1rem' }}>
+          <label 
+            htmlFor="title" 
+            style={{ 
+              display: 'block', 
+              fontWeight: 'bold', 
+              marginBottom: '0.5rem',
+              color: '#333'
+            }}
+          >
+            Title:
+          </label>
+          <input
+            type="text"
+            id="title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Enter media title (min 3 characters)"
+            minLength="3"
+            style={{
+              padding: '0.5rem',
+              border: '1px solid #ccc',
+              borderRadius: '4px',
+              fontSize: '1rem',
+              width: '100%',
+              maxWidth: '400px'
+            }}
+            required
+          />
         </div>
 
         <div style={{ marginBottom: '1.5rem' }}>

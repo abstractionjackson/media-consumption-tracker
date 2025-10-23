@@ -64,6 +64,16 @@ export function validateData(data, schema) {
       }
     }
     
+    // Length validation for strings
+    if (prop.type === 'string' && typeof value === 'string') {
+      if (prop.minLength !== undefined && value.length < prop.minLength) {
+        errors.push(`Field ${key} must be at least ${prop.minLength} characters`)
+      }
+      if (prop.maxLength !== undefined && value.length > prop.maxLength) {
+        errors.push(`Field ${key} must be at most ${prop.maxLength} characters`)
+      }
+    }
+    
     // Range validation for integers
     if (prop.type === 'integer') {
       if (prop.minimum !== undefined && value < prop.minimum) {
@@ -132,15 +142,17 @@ export function validateMedia(data) {
  * Creates a new media entry with validation
  * @param {string} date - Date in YYYY-MM-DD format
  * @param {string} type - Media type (book, video, podcast, music)
+ * @param {string} title - Title or name of the media (minimum 3 characters)
  * @param {number} duration - Duration in minutes (positive integer)
  * @param {string} id - Optional UUID (will be generated if not provided)
  * @returns {Object} Either the valid media object or validation errors
  */
-export function createMediaEntry(date, type, duration, id = null) {
+export function createMediaEntry(date, type, title, duration, id = null) {
   const entry = { 
     id: id || generateUUID(),
     date, 
-    type, 
+    type,
+    title,
     duration 
   }
   const validation = validateMedia(entry)

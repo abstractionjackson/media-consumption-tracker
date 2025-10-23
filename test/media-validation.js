@@ -10,15 +10,15 @@ console.log('=== Media Schema Validation Tests ===\n')
 // Test 1: Valid media entries
 console.log('Test 1: Valid media entries')
 const validTests = [
-  { date: '2024-10-23', type: 'book', duration: 60 },
-  { date: '2024-10-23', type: 'video', duration: 120 },
-  { date: '2024-10-23', type: 'podcast', duration: 45 },
-  { date: '2024-10-23', type: 'music', duration: 30 },
-  { date: '2024-10-23', type: 'book', duration: 1 }, // minimum duration
+  { date: '2024-10-23', type: 'book', title: 'The Great Gatsby', duration: 60 },
+  { date: '2024-10-23', type: 'video', title: 'Inception', duration: 120 },
+  { date: '2024-10-23', type: 'podcast', title: 'Serial', duration: 45 },
+  { date: '2024-10-23', type: 'music', title: 'Abbey Road', duration: 30 },
+  { date: '2024-10-23', type: 'book', title: 'War and Peace', duration: 1 }, // minimum duration
 ]
 
 validTests.forEach((test, idx) => {
-  const result = createMediaEntry(test.date, test.type, test.duration)
+  const result = createMediaEntry(test.date, test.type, test.title, test.duration)
   console.log(`  ${idx + 1}. ${JSON.stringify(test)} -> ${result.success ? '✓ PASS' : '✗ FAIL'}`)
   if (!result.success) {
     console.log(`     Errors: ${result.errors.join(', ')}`)
@@ -32,12 +32,14 @@ console.log('\nTest 2: Invalid media entries (should fail)')
 const invalidTests = [
   { date: 'invalid-date', type: 'book', duration: 60, expected: 'Invalid date format' },
   { date: '2024-10-23', type: 'invalid', duration: 60, expected: 'Invalid type' },
-  { date: '2024-10-23', type: 'book', duration: 0, expected: 'Duration too small' },
-  { date: '2024-10-23', type: 'book', duration: -30, expected: 'Negative duration' },
-  { date: '2024-10-23', type: 'book', duration: 30.5, expected: 'Non-integer duration' },
-  { type: 'book', duration: 60, expected: 'Missing date' },
-  { date: '2024-10-23', duration: 60, expected: 'Missing type' },
-  { date: '2024-10-23', type: 'book', expected: 'Missing duration' },
+  { date: '2024-10-23', type: 'book', title: 'Test', duration: 0, expected: 'Duration too small' },
+  { date: '2024-10-23', type: 'book', title: 'Test', duration: -30, expected: 'Negative duration' },
+  { date: '2024-10-23', type: 'book', title: 'Test', duration: 30.5, expected: 'Non-integer duration' },
+  { date: '2024-10-23', type: 'book', title: 'AB', duration: 60, expected: 'Title too short' },
+  { type: 'book', title: 'Test', duration: 60, expected: 'Missing date' },
+  { date: '2024-10-23', title: 'Test', duration: 60, expected: 'Missing type' },
+  { date: '2024-10-23', type: 'book', duration: 60, expected: 'Missing title' },
+  { date: '2024-10-23', type: 'book', title: 'Test', expected: 'Missing duration' },
 ]
 
 invalidTests.forEach((test, idx) => {

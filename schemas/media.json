@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://happiness-vibe.app/schemas/media.json",
   "title": "Media Entry",
-  "description": "A media consumption tracking entry with date, type, and duration",
+  "description": "A media consumption tracking entry with date, type, title, and duration",
   "type": "object",
   "properties": {
     "id": {
@@ -24,6 +24,12 @@
       "description": "Type of media consumed. Extensible - add new types to enum list as needed.",
       "examples": ["book", "video", "podcast", "music"]
     },
+    "title": {
+      "type": "string",
+      "minLength": 3,
+      "description": "Title or name of the media (minimum 3 characters)",
+      "examples": ["The Great Gatsby", "Inception", "Serial Podcast", "Abbey Road"]
+    },
     "duration": {
       "type": "integer",
       "minimum": 1,
@@ -31,6 +37,6 @@
       "examples": [30, 60, 120, 240]
     }
   },
-  "required": ["id", "date", "type", "duration"],
+  "required": ["id", "date", "type", "title", "duration"],
   "additionalProperties": false
 }
