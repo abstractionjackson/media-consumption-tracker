@@ -22,6 +22,7 @@ export default function Home() {
   const [editingEntry, setEditingEntry] = useState(null)
   const [showMediaFormModal, setShowMediaFormModal] = useState(false)
   const [editingMediaEntry, setEditingMediaEntry] = useState(null)
+  const [activeTab, setActiveTab] = useState('happiness')
 
   // Find today's entry
   const todayEntry = useMemo(() => {
@@ -517,17 +518,100 @@ export default function Home() {
         </div>
       )}
 
+      {/* Tabbed Container for Tables */}
       <section>
-        <h2 style={{ color: '#333', marginBottom: '1rem' }}>
-          Your Happiness Entries
-        </h2>
-        <HappinessTable 
-          data={entries}
-          mediaData={mediaEntries}
-          onDeleteEntries={handleDeleteEntries}
-          onUpdateEntry={handleUpdateEntry}
-          onEditEntry={handleEditEntry}
-        />
+        <div style={{
+          border: '1px solid #e0e0e0',
+          borderRadius: '8px',
+          backgroundColor: 'white',
+          overflow: 'hidden'
+        }}>
+          {/* Tab Headers */}
+          <div style={{
+            display: 'flex',
+            borderBottom: '2px solid #e0e0e0',
+            backgroundColor: '#f8f9fa'
+          }}>
+            <button
+              onClick={() => setActiveTab('happiness')}
+              style={{
+                flex: 1,
+                padding: '1rem 2rem',
+                border: 'none',
+                backgroundColor: activeTab === 'happiness' ? 'white' : 'transparent',
+                borderBottom: activeTab === 'happiness' ? '3px solid #007cba' : '3px solid transparent',
+                color: activeTab === 'happiness' ? '#007cba' : '#666',
+                fontWeight: activeTab === 'happiness' ? 'bold' : 'normal',
+                fontSize: '1rem',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                marginBottom: '-2px'
+              }}
+              onMouseOver={(e) => {
+                if (activeTab !== 'happiness') {
+                  e.target.style.backgroundColor = '#e9ecef'
+                }
+              }}
+              onMouseOut={(e) => {
+                if (activeTab !== 'happiness') {
+                  e.target.style.backgroundColor = 'transparent'
+                }
+              }}
+            >
+              😊 Happiness Entries ({entries.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('media')}
+              style={{
+                flex: 1,
+                padding: '1rem 2rem',
+                border: 'none',
+                backgroundColor: activeTab === 'media' ? 'white' : 'transparent',
+                borderBottom: activeTab === 'media' ? '3px solid #007cba' : '3px solid transparent',
+                color: activeTab === 'media' ? '#007cba' : '#666',
+                fontWeight: activeTab === 'media' ? 'bold' : 'normal',
+                fontSize: '1rem',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                marginBottom: '-2px'
+              }}
+              onMouseOver={(e) => {
+                if (activeTab !== 'media') {
+                  e.target.style.backgroundColor = '#e9ecef'
+                }
+              }}
+              onMouseOut={(e) => {
+                if (activeTab !== 'media') {
+                  e.target.style.backgroundColor = 'transparent'
+                }
+              }}
+            >
+              🎬 Media Entries ({mediaEntries.length})
+            </button>
+          </div>
+
+          {/* Tab Content */}
+          <div style={{ padding: '1.5rem' }}>
+            {activeTab === 'happiness' && (
+              <HappinessTable 
+                data={entries}
+                mediaData={mediaEntries}
+                onDeleteEntries={handleDeleteEntries}
+                onUpdateEntry={handleUpdateEntry}
+                onEditEntry={handleEditEntry}
+              />
+            )}
+
+            {activeTab === 'media' && (
+              <MediaTable 
+                data={mediaEntries}
+                onDeleteEntries={handleDeleteMediaEntries}
+                onEditEntry={handleEditMediaEntry}
+                onAddEntry={handleOpenMediaForm}
+              />
+            )}
+          </div>
+        </div>
       </section>
 
       {/* Media Form Modal */}
@@ -615,18 +699,6 @@ export default function Home() {
           </div>
         </div>
       )}
-
-      <section style={{ marginTop: '3rem' }}>
-        <h2 style={{ color: '#333', marginBottom: '1rem' }}>
-          Your Media Entries
-        </h2>
-        <MediaTable 
-          data={mediaEntries}
-          onDeleteEntries={handleDeleteMediaEntries}
-          onEditEntry={handleEditMediaEntry}
-          onAddEntry={handleOpenMediaForm}
-        />
-      </section>
     </main>
   )
 }
