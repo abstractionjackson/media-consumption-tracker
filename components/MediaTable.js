@@ -5,7 +5,6 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { Eye } from 'lucide-react'
 import {
   useReactTable,
   getCoreRowModel,
@@ -155,10 +154,7 @@ export default function MediaTable({ data, onDeleteEntries, onEditEntry, onAddEn
               borderRadius: '4px',
               fontSize: '0.9rem',
               cursor: 'pointer',
-              transition: 'background-color 0.2s',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem'
+              transition: 'background-color 0.2s'
             }}
             onMouseOver={(e) => {
               e.target.style.backgroundColor = '#005a87'
@@ -167,7 +163,6 @@ export default function MediaTable({ data, onDeleteEntries, onEditEntry, onAddEn
               e.target.style.backgroundColor = '#007cba'
             }}
           >
-            <Eye size={16} />
             View Details
           </button>
         ),
