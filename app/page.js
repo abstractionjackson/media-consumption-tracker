@@ -1,9 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { HAPPINESS_LEVELS, formatDate } from '../lib/happiness.js'
 import HappinessForm from '../components/HappinessForm.js'
 import HappinessTable from '../components/HappinessTable.js'
+
+const STORAGE_KEY = 'happiness-vibe-entries'
 
 /**
  * Home page component showing happiness tracking
@@ -11,6 +13,32 @@ import HappinessTable from '../components/HappinessTable.js'
  */
 export default function Home() {
   const [entries, setEntries] = useState([])
+  const [isLoaded, setIsLoaded] = useState(false)
+
+  // Load entries from localStorage on mount
+  useEffect(() => {
+    try {
+      const storedEntries = localStorage.getItem(STORAGE_KEY)
+      if (storedEntries) {
+        setEntries(JSON.parse(storedEntries))
+      }
+    } catch (error) {
+      console.error('Failed to load entries from localStorage:', error)
+    } finally {
+      setIsLoaded(true)
+    }
+  }, [])
+
+  // Save entries to localStorage whenever they change
+  useEffect(() => {
+    if (isLoaded) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(entries))
+      } catch (error) {
+        console.error('Failed to save entries to localStorage:', error)
+      }
+    }
+  }, [entries, isLoaded])
 
   /**
    * Handles adding a new happiness entry
