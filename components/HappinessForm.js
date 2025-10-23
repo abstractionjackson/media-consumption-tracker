@@ -13,9 +13,10 @@ import { HAPPINESS_LEVELS, getTodayDate } from '../lib/happiness.js'
  * @param {Object} props - Component props
  * @param {Function} props.onEntryAdded - Callback when entry is successfully added
  * @param {Object} props.initialEntry - Optional initial entry for editing
+ * @param {Function} props.onEntryUpdated - Optional callback when entry is updated (passes old and new entry)
  * @returns {JSX.Element} The happiness entry form
  */
-export default function HappinessForm({ onEntryAdded, initialEntry }) {
+export default function HappinessForm({ onEntryAdded, initialEntry, onEntryUpdated }) {
   const [date, setDate] = useState(initialEntry?.date || getTodayDate())
   const [happiness, setHappiness] = useState(initialEntry?.happiness ?? 0)
   const [errors, setErrors] = useState([])
@@ -37,12 +38,19 @@ export default function HappinessForm({ onEntryAdded, initialEntry }) {
     
     if (result.success) {
       setSuccessMessage('Happiness entry logged successfully! 🎉')
-      if (onEntryAdded) {
+      
+      // If editing an existing entry, use onEntryUpdated callback
+      if (initialEntry && onEntryUpdated) {
+        onEntryUpdated(initialEntry, result.data)
+      } else if (onEntryAdded) {
         onEntryAdded(result.data)
       }
-      // Reset form
-      setDate(getTodayDate())
-      setHappiness(0)
+      
+      // Reset form only if not editing
+      if (!initialEntry) {
+        setDate(getTodayDate())
+        setHappiness(0)
+      }
     } else {
       setErrors(result.errors)
     }

@@ -97,12 +97,16 @@ export default function Home() {
    */
   const handleUpdateEntry = (oldEntry, newEntry) => {
     setEntries(prevEntries => {
-      return prevEntries.map(entry => {
-        if (entry.date === oldEntry.date && entry.happiness === oldEntry.happiness) {
-          return newEntry
-        }
-        return entry
-      })
+      // Remove the old entry
+      const filtered = prevEntries.filter(entry => 
+        !(entry.date === oldEntry.date && entry.happiness === oldEntry.happiness)
+      )
+      // If date changed, also remove any existing entry with the new date
+      const filteredByNewDate = newEntry.date !== oldEntry.date
+        ? filtered.filter(entry => entry.date !== newEntry.date)
+        : filtered
+      // Add the new entry and sort by date (newest first)
+      return [newEntry, ...filteredByNewDate].sort((a, b) => new Date(b.date) - new Date(a.date))
     })
   }
 
@@ -232,7 +236,11 @@ export default function Home() {
                 onEntryAdded={(entry) => {
                   handleEntryAdded(entry)
                   setShowFormModal(false)
-                }} 
+                }}
+                onEntryUpdated={(oldEntry, newEntry) => {
+                  handleUpdateEntry(oldEntry, newEntry)
+                  setShowFormModal(false)
+                }}
               />
             </div>
           </div>
