@@ -87,6 +87,20 @@ export default function Home() {
   }
 
   /**
+   * Handles deleting a media entry
+   * @param {Object} mediaEntry - The media entry to delete
+   */
+  const handleMediaEntryDeleted = (mediaEntry) => {
+    setMediaEntries(prevMedia => {
+      return prevMedia.filter(media => 
+        !(media.date === mediaEntry.date && 
+          media.type === mediaEntry.type && 
+          media.duration === mediaEntry.duration)
+      )
+    })
+  }
+
+  /**
    * Handles adding a new happiness entry
    * @param {Object} newEntry - The new happiness entry
    */
@@ -276,6 +290,7 @@ export default function Home() {
                   setEditingEntry(null)
                 }}
                 onMediaEntriesAdded={handleMediaEntriesAdded}
+                onMediaEntryDeleted={handleMediaEntryDeleted}
               />
             </div>
           </div>

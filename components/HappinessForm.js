@@ -16,10 +16,11 @@ import { MEDIA_TYPES } from '../lib/media.js'
  * @param {Object} props.initialEntry - Optional initial entry for editing
  * @param {Function} props.onEntryUpdated - Optional callback when entry is updated (passes old and new entry)
  * @param {Function} props.onMediaEntriesAdded - Optional callback when media entries are added
+ * @param {Function} props.onMediaEntryDeleted - Optional callback when a media entry is deleted
  * @param {Array} props.allMediaEntries - All media entries to filter by date
  * @returns {JSX.Element} The happiness entry form
  */
-export default function HappinessForm({ onEntryAdded, initialEntry, onEntryUpdated, onMediaEntriesAdded, allMediaEntries = [] }) {
+export default function HappinessForm({ onEntryAdded, initialEntry, onEntryUpdated, onMediaEntriesAdded, onMediaEntryDeleted, allMediaEntries = [] }) {
   const [date, setDate] = useState(initialEntry?.date || getTodayDate())
   const [happiness, setHappiness] = useState(initialEntry?.happiness ?? 0)
   const [errors, setErrors] = useState([])
@@ -46,7 +47,16 @@ export default function HappinessForm({ onEntryAdded, initialEntry, onEntryUpdat
    * @param {number} index - Index of the media entry to remove
    */
   const handleRemoveMediaEntry = (index) => {
-    setMediaEntries(mediaEntries.filter((_, i) => i !== index))
+    const mediaToRemove = mediaEntries[index]
+    
+    // Remove from local state
+    const updatedEntries = mediaEntries.filter((_, i) => i !== index)
+    setMediaEntries(updatedEntries)
+    
+    // If this is an existing media entry (has all fields matching stored entry), notify parent to delete
+    if (onMediaEntryDeleted && mediaToRemove.date && mediaToRemove.type && mediaToRemove.duration) {
+      onMediaEntryDeleted(mediaToRemove)
+    }
   }
 
   /**
