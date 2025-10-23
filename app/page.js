@@ -50,32 +50,6 @@ export default function Home() {
       {/* Happiness Entry Form */}
       <HappinessForm onEntryAdded={handleEntryAdded} />
 
-      <section style={{ marginBottom: '2rem' }}>
-        <h2 style={{ color: '#333', marginBottom: '1rem' }}>
-          Happiness Scale Reference
-        </h2>
-        <div style={{ 
-          display: 'grid', 
-          gap: '0.5rem',
-          marginBottom: '2rem' 
-        }}>
-          {Object.entries(HAPPINESS_LEVELS).map(([level, description]) => (
-            <div key={level} style={{
-              padding: '0.5rem',
-              border: '1px solid #ddd',
-              borderRadius: '4px',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              backgroundColor: '#fff'
-            }}>
-              <span style={{ fontWeight: 'bold' }}>Level {level}:</span>
-              <span>{description}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
       <section>
         <h2 style={{ color: '#333', marginBottom: '1rem' }}>
           Your Happiness Entries ({entries.length})
