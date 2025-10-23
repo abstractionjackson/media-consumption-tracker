@@ -14,6 +14,7 @@ import {
   createColumnHelper
 } from '@tanstack/react-table'
 import { HAPPINESS_LEVELS, formatDate } from '../lib/happiness.js'
+import ConfirmDialog from './ConfirmDialog.js'
 
 const columnHelper = createColumnHelper()
 
@@ -22,11 +23,55 @@ const columnHelper = createColumnHelper()
  * @param {Object} props - Component props
  * @param {Array} props.data - Array of happiness entries
  * @param {Function} props.onDeleteEntries - Callback when entries are deleted
+ * @param {Function} props.onUpdateEntry - Callback when an entry is updated
  * @returns {JSX.Element} The data table
  */
-export default function HappinessTable({ data, onDeleteEntries }) {
+export default function HappinessTable({ data, onDeleteEntries, onUpdateEntry }) {
   const [rowSelection, setRowSelection] = useState({})
   const [sorting, setSorting] = useState([{ id: 'date', desc: true }])
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [editingCell, setEditingCell] = useState(null)
+  const [editValue, setEditValue] = useState('')
+
+  /**
+   * Handles starting edit mode for a cell
+   */
+  const handleStartEdit = (rowId, currentValue) => {
+    setEditingCell(rowId)
+    setEditValue(currentValue.toString())
+  }
+
+  /**
+   * Handles canceling edit mode
+   */
+  const handleCancelEdit = () => {
+    setEditingCell(null)
+    setEditValue('')
+  }
+
+  /**
+   * Handles saving the edited value
+   */
+  const handleSaveEdit = (originalEntry) => {
+    const newValue = parseInt(editValue, 10)
+    
+    // Validate the new value
+    if (isNaN(newValue) || newValue < -2 || newValue > 2) {
+      handleCancelEdit()
+      return
+    }
+    
+    // Only update if the value actually changed
+    if (newValue !== originalEntry.happiness) {
+      const updatedEntry = {
+        ...originalEntry,
+        happiness: newValue
+      }
+      onUpdateEntry?.(originalEntry, updatedEntry)
+    }
+    
+    handleCancelEdit()
+  }
 
   // Table columns definition
   const columns = useMemo(
@@ -69,8 +114,66 @@ export default function HappinessTable({ data, onDeleteEntries }) {
         header: 'Happiness Level',
         cell: (info) => {
           const level = info.getValue()
-          return (
+          const rowId = info.row.id
+          const isEditing = editingCell === rowId
+          
+          return isEditing ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <input
+                type="number"
+                min="-2"
+                max="2"
+                value={editValue}
+                onChange={(e) => setEditValue(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleSaveEdit(info.row.original)
+                  } else if (e.key === 'Escape') {
+                    handleCancelEdit()
+                  }
+                }}
+                onBlur={() => handleSaveEdit(info.row.original)}
+                autoFocus
+                style={{
+                  minWidth: '30px',
+                  width: '65px',
+                  textAlign: 'center',
+                  padding: '0.25rem 0.5rem',
+                  backgroundColor: parseInt(editValue) >= 0 ? '#e8f5e8' : '#ffeaea',
+                  color: parseInt(editValue) >= 0 ? '#2d5a2d' : '#8b2635',
+                  border: '2px solid #0d6efd',
+                  borderRadius: '4px',
+                  fontSize: '0.9rem',
+                  fontWeight: 'bold',
+                  outline: 'none',
+                  boxShadow: 'none',
+                  margin: 0
+                }}
+              />
+              <span style={{ fontSize: '0.9rem', color: '#495057' }}>
+                {HAPPINESS_LEVELS[editValue] || ''}
+              </span>
+            </div>
+          ) : (
+            <div 
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '0.5rem',
+                cursor: 'pointer',
+                padding: '0.25rem',
+                borderRadius: '4px',
+                transition: 'background-color 0.2s'
+              }}
+              onClick={() => handleStartEdit(rowId, level)}
+              onMouseOver={(e) => {
+                e.currentTarget.style.backgroundColor = '#f8f9fa'
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent'
+              }}
+              title="Click to edit"
+            >
               <span style={{
                 display: 'inline-block',
                 minWidth: '30px',
@@ -91,7 +194,7 @@ export default function HappinessTable({ data, onDeleteEntries }) {
         sortingFn: 'basic',
       }),
     ],
-    []
+    [editingCell, editValue, handleStartEdit, handleSaveEdit, handleCancelEdit]
   )
 
   const table = useReactTable({
@@ -118,22 +221,36 @@ export default function HappinessTable({ data, onDeleteEntries }) {
    */
   const handleDeleteSelected = () => {
     if (selectedCount === 0) return
-    
-    const confirmed = window.confirm(
-      `Are you sure you want to delete ${selectedCount} selected ${
-        selectedCount === 1 ? 'entry' : 'entries'
-      }?`
-    )
-    
-    if (confirmed) {
-      const selectedData = selectedRows.map(row => row.original)
-      onDeleteEntries(selectedData)
-      setRowSelection({})
-    }
+    setShowDeleteDialog(true)
+  }
+
+  const handleConfirmDelete = () => {
+    const selectedData = selectedRows.map(row => row.original)
+    onDeleteEntries(selectedData)
+    setRowSelection({})
+    setShowDeleteDialog(false)
+  }
+
+  const handleCancelDelete = () => {
+    setShowDeleteDialog(false)
   }
 
   return (
     <div style={{ width: '100%' }}>
+      {/* Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={showDeleteDialog}
+        title="Delete Selected Entries"
+        message={`Are you sure you want to delete ${selectedCount} selected ${
+          selectedCount === 1 ? 'entry' : 'entries'
+        }? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+        variant="danger"
+      />
+
       {/* Table controls */}
       <div style={{
         display: 'flex',

@@ -36,6 +36,22 @@ export default function Home() {
     })
   }
 
+  /**
+   * Handles updating an existing entry
+   * @param {Object} oldEntry - The original entry
+   * @param {Object} newEntry - The updated entry
+   */
+  const handleUpdateEntry = (oldEntry, newEntry) => {
+    setEntries(prevEntries => {
+      return prevEntries.map(entry => {
+        if (entry.date === oldEntry.date && entry.happiness === oldEntry.happiness) {
+          return newEntry
+        }
+        return entry
+      })
+    })
+  }
+
   return (
     <main style={{ 
       padding: '2rem', 
@@ -69,6 +85,7 @@ export default function Home() {
         <HappinessTable 
           data={entries} 
           onDeleteEntries={handleDeleteEntries}
+          onUpdateEntry={handleUpdateEntry}
         />
       </section>
     </main>
