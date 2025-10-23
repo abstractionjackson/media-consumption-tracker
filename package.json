@@ -1,7 +1,7 @@
 {
-  "name": "happiness-vibe",
+  "name": "eyeballs-in",
   "version": "1.0.0",
-  "description": "A simple Next.js happiness vibe app",
+  "description": "Happiness by Media Consumed - Track your happiness levels and media consumption",
   "main": "index.js",
   "scripts": {
     "dev": "next dev",
@@ -12,7 +12,9 @@
   "keywords": [
     "nextjs",
     "react",
-    "happiness"
+    "happiness",
+    "media-tracking",
+    "wellbeing"
   ],
   "author": "",
   "license": "ISC",

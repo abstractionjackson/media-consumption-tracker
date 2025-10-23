@@ -9,8 +9,8 @@ import MediaForm from '../components/MediaForm.js'
 import MediaTable from '../components/MediaTable.js'
 import HappinessDetailView from '../components/HappinessDetailView.js'
 
-const STORAGE_KEY = 'happiness-vibe-entries'
-const MEDIA_STORAGE_KEY = 'happiness-vibe-media-entries'
+const STORAGE_KEY = 'eyeballs-in-entries'
+const MEDIA_STORAGE_KEY = 'eyeballs-in-media-entries'
 
 /**
  * Home page component showing happiness tracking
@@ -278,13 +278,13 @@ export default function Home() {
           margin: '0 0 1rem 0', 
           color: '#333' 
         }}>
-          Happiness Vibe Tracker 🌟
+          Eyeballs In
         </h1>
         <p style={{ 
           fontSize: '1.2rem', 
           color: '#666' 
         }}>
-          Track your daily happiness levels
+          Happiness by Media Consumed
         </p>
       </header>
 

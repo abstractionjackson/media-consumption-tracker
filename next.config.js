@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',
-  basePath: '/happiness-vibe',
+  basePath: '/eyeballs-in',
   images: {
     unoptimized: true,
   },

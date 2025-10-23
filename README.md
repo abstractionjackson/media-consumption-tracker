@@ -1,6 +1,6 @@
-# Happiness Vibe Tracker 🌟
+# Eyeballs In
 
-A simple Next.js application for tracking daily happiness levels using JSON Schema validation.
+Happiness by Media Consumed - A Next.js application for tracking daily happiness levels and media consumption.
 
 ## Data Schema
 
