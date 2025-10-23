@@ -112,16 +112,7 @@ export default function HappinessTable({ data, mediaData = [], onDeleteEntries, 
       }),
       columnHelper.accessor('date', {
         header: 'Date',
-        cell: (info) => (
-          <div>
-            <div style={{ fontWeight: 'bold' }}>
-              {formatDate(info.getValue())}
-            </div>
-            <div style={{ fontSize: '0.85rem', color: '#666' }}>
-              {info.getValue()}
-            </div>
-          </div>
-        ),
+        cell: (info) => formatDate(info.getValue()),
         sortingFn: 'datetime',
       }),
       columnHelper.accessor('happiness', {
