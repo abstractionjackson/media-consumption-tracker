@@ -1,0 +1,20 @@
+{
+  "name": "happiness-vibe",
+  "version": "1.0.0",
+  "description": "A simple Next.js happiness vibe app",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "keywords": ["nextjs", "react", "happiness"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "next": "^16.0.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  }
+}
