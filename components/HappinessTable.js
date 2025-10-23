@@ -5,6 +5,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { Target } from 'lucide-react'
 import {
   useReactTable,
   getCoreRowModel,
@@ -470,10 +471,15 @@ export default function HappinessTable({ data, mediaData = [], onDeleteEntries, 
                     padding: '3rem',
                     textAlign: 'center',
                     color: '#6c757d',
-                    fontStyle: 'italic'
+                    fontStyle: 'italic',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.5rem'
                   }}
                 >
-                  No happiness entries yet. Add your first entry above! 🎯
+                  <Target size={20} />
+                  No happiness entries yet. Add your first entry above!
                 </td>
               </tr>
             ) : (

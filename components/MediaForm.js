@@ -5,6 +5,7 @@
 'use client'
 
 import { useState } from 'react'
+import { Check } from 'lucide-react'
 import { createMediaEntry } from '../schemas/index.js'
 import { MEDIA_TYPES, getTodayDate } from '../lib/media.js'
 
@@ -39,7 +40,12 @@ export default function MediaForm({ onEntryAdded, initialEntry, onEntryUpdated }
     const result = createMediaEntry(date, type, title, parseInt(duration), initialEntry?.id)
     
     if (result.success) {
-      setSuccessMessage('Media entry logged successfully! 🎉')
+      setSuccessMessage(
+        <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <Check size={20} />
+          Media entry logged successfully!
+        </span>
+      )
       
       // If editing an existing entry, use onEntryUpdated callback
       if (initialEntry && onEntryUpdated) {

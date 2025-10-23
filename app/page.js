@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+import { Smile, Film, Edit3 } from 'lucide-react'
 import { HAPPINESS_LEVELS, formatDate, getTodayDate } from '../lib/happiness.js'
 import HappinessForm from '../components/HappinessForm.js'
 import HappinessTable from '../components/HappinessTable.js'
@@ -324,8 +325,16 @@ export default function Home() {
               justifyContent: 'space-between',
               alignItems: 'center'
             }}>
-              <h2 style={{ margin: 0, color: '#333', fontSize: '1.5rem' }}>
-                {editingEntry ? 'Edit Your Happiness' : 'Log Your Happiness'} 📝
+              <h2 style={{ 
+                margin: 0, 
+                color: '#333', 
+                fontSize: '1.5rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}>
+                <Edit3 size={24} />
+                {editingEntry ? 'Edit Your Happiness' : 'Log Your Happiness'}
               </h2>
               <button
                 onClick={handleCloseForm}
@@ -405,7 +414,11 @@ export default function Home() {
               fontWeight: 'bold',
               cursor: 'pointer',
               transition: 'background-color 0.2s',
-              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              margin: '0 auto'
             }}
             onMouseOver={(e) => {
               e.target.style.backgroundColor = '#005a87'
@@ -414,7 +427,8 @@ export default function Home() {
               e.target.style.backgroundColor = '#007cba'
             }}
           >
-            Log Your Happiness 📝
+            <Edit3 size={20} />
+            Log Your Happiness
           </button>
         </div>
       )}
@@ -446,7 +460,11 @@ export default function Home() {
                 fontSize: '1rem',
                 cursor: 'pointer',
                 transition: 'all 0.2s',
-                marginBottom: '-2px'
+                marginBottom: '-2px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem'
               }}
               onMouseOver={(e) => {
                 if (activeTab !== 'happiness') {
@@ -459,7 +477,8 @@ export default function Home() {
                 }
               }}
             >
-              😊 Happiness Entries ({entries.length})
+              <Smile size={20} />
+              Happiness Entries ({entries.length})
             </button>
             <button
               onClick={() => setActiveTab('media')}
@@ -474,7 +493,11 @@ export default function Home() {
                 fontSize: '1rem',
                 cursor: 'pointer',
                 transition: 'all 0.2s',
-                marginBottom: '-2px'
+                marginBottom: '-2px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem'
               }}
               onMouseOver={(e) => {
                 if (activeTab !== 'media') {
@@ -487,7 +510,8 @@ export default function Home() {
                 }
               }}
             >
-              🎬 Media Entries ({mediaEntries.length})
+              <Film size={20} />
+              Media Entries ({mediaEntries.length})
             </button>
           </div>
 
@@ -553,8 +577,16 @@ export default function Home() {
               justifyContent: 'space-between',
               alignItems: 'center'
             }}>
-              <h2 style={{ margin: 0, color: '#333', fontSize: '1.5rem' }}>
-                {editingMediaEntry ? 'Edit Media Entry' : 'Log Media Entry'} 🎬
+              <h2 style={{ 
+                margin: 0, 
+                color: '#333', 
+                fontSize: '1.5rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}>
+                <Film size={24} />
+                {editingMediaEntry ? 'Edit Media Entry' : 'Log Media Entry'}
               </h2>
               <button
                 onClick={handleCloseMediaForm}

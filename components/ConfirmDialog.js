@@ -5,6 +5,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { AlertTriangle, Zap, Info } from 'lucide-react'
 
 /**
  * Custom confirmation dialog component
@@ -59,23 +60,24 @@ export default function ConfirmDialog({
       confirmBg: '#dc3545',
       confirmHoverBg: '#c82333',
       iconColor: '#dc3545',
-      icon: '⚠️'
+      icon: AlertTriangle
     },
     warning: {
       confirmBg: '#ffc107',
       confirmHoverBg: '#e0a800',
       iconColor: '#ffc107',
-      icon: '⚡'
+      icon: Zap
     },
     info: {
       confirmBg: '#0d6efd',
       confirmHoverBg: '#0b5ed7',
       iconColor: '#0d6efd',
-      icon: 'ℹ️'
+      icon: Info
     }
   }
 
   const style = variantStyles[variant] || variantStyles.danger
+  const IconComponent = style.icon
 
   return (
     <div
@@ -131,12 +133,13 @@ export default function ConfirmDialog({
         <div style={{ marginBottom: '1.5rem' }}>
           <div
             style={{
-              fontSize: '2.5rem',
+              display: 'flex',
+              justifyContent: 'center',
               marginBottom: '0.75rem',
-              textAlign: 'center'
+              color: style.iconColor
             }}
           >
-            {style.icon}
+            <IconComponent size={48} />
           </div>
           <h3
             style={{

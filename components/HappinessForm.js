@@ -5,6 +5,7 @@
 'use client'
 
 import { useState } from 'react'
+import { Check, Frown, Meh, Smile } from 'lucide-react'
 import { createHappinessEntry } from '../schemas/index.js'
 import { HAPPINESS_LEVELS, getTodayDate } from '../lib/happiness.js'
 
@@ -76,7 +77,12 @@ export default function HappinessForm({ onEntryAdded, initialEntry, onEntryUpdat
     const happinessResult = createHappinessEntry(date, parseInt(happiness))
     
     if (happinessResult.success) {
-      setSuccessMessage('Entry logged successfully! 🎉')
+      setSuccessMessage(
+        <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <Check size={20} />
+          Entry logged successfully!
+        </span>
+      )
       
       // If editing an existing entry, use onEntryUpdated callback
       if (initialEntry && onEntryUpdated) {
@@ -173,9 +179,15 @@ export default function HappinessForm({ onEntryAdded, initialEntry, onEntryUpdat
             color: '#666',
             marginTop: '0.5rem'
           }}>
-            <span>😢 Very Unhappy</span>
-            <span>😐 Neutral</span>
-            <span>😄 Very Happy</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+              <Frown size={16} /> Very Unhappy
+            </span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+              <Meh size={16} /> Neutral
+            </span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+              <Smile size={16} /> Very Happy
+            </span>
           </div>
         </div>
 
