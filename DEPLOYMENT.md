@@ -4,9 +4,9 @@
 
 ### 1. Create GitHub Repository
 
-Go to GitHub and create a new repository named `eyeballs-in`:
+Go to GitHub and create a new repository named `media-consumption-tracker`:
 - https://github.com/new
-- Repository name: `eyeballs-in`
+- Repository name: `media-consumption-tracker`
 - Set to Public (required for GitHub Pages on free tier)
 - Do NOT initialize with README, .gitignore, or license (we already have these)
 
@@ -15,7 +15,7 @@ Go to GitHub and create a new repository named `eyeballs-in`:
 Replace `YOUR_USERNAME` with your GitHub username:
 
 ```bash
-git remote add origin https://github.com/YOUR_USERNAME/eyeballs-in.git
+git remote add origin https://github.com/YOUR_USERNAME/media-consumption-tracker.git
 git branch -M main
 git push -u origin main
 ```
@@ -42,7 +42,7 @@ The workflow will automatically run when you push to main. To manually trigger:
 After deployment completes (usually 1-2 minutes), your site will be available at:
 
 ```
-https://YOUR_USERNAME.github.io/eyeballs-in/
+https://YOUR_USERNAME.github.io/media-consumption-tracker/
 ```
 
 ## Local Testing
@@ -57,7 +57,7 @@ npm run build
 npx serve out
 ```
 
-Then visit http://localhost:3000/eyeballs-in/
+Then visit http://localhost:3000/media-consumption-tracker/
 
 ## Updating the Site
 

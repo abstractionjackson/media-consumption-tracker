@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://eyeballs-in.app/schemas/happiness.json",
+  "$id": "https://media-consumption-tracker.app/schemas/happiness.json",
   "title": "Happiness Entry",
   "description": "A daily happiness tracking entry with date and happiness level",
   "type": "object",
