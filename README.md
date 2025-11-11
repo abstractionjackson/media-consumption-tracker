@@ -1,4 +1,4 @@
-# Eyeballs In
+# Media Consumption Tracker
 
 Happiness by Media Consumed - A Next.js application for tracking daily happiness levels and media consumption.
 

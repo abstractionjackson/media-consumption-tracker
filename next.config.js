@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',
-  basePath: '/eyeballs-in',
+  basePath: '/media-consumption-tracker',
   images: {
     unoptimized: true,
   },

@@ -9,8 +9,8 @@ import MediaForm from '../components/MediaForm.js'
 import MediaTable from '../components/MediaTable.js'
 import HappinessDetailView from '../components/HappinessDetailView.js'
 
-const STORAGE_KEY = 'eyeballs-in-entries'
-const MEDIA_STORAGE_KEY = 'eyeballs-in-media-entries'
+const STORAGE_KEY = 'media-consumption-tracker-entries'
+const MEDIA_STORAGE_KEY = 'media-consumption-tracker-media-entries'
 
 /**
  * Home page component showing happiness tracking
@@ -278,7 +278,7 @@ export default function Home() {
           margin: '0 0 1rem 0', 
           color: '#333' 
         }}>
-          Eyeballs In
+          Media Consumption Tracker
         </h1>
         <p style={{ 
           fontSize: '1.2rem', 

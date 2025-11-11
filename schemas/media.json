@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://eyeballs-in.app/schemas/media.json",
+  "$id": "https://media-consumption-tracker.app/schemas/media.json",
   "title": "Media Entry",
   "description": "A media consumption tracking entry with date, type, title, and duration",
   "type": "object",
